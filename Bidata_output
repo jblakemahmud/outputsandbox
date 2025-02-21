@@ -1,0 +1,294 @@
+> bimodelsex <-lmer(photo ~ sex+par+field_season+combined_caliper+condition+RH_S+time_clean+VpdL+Tleaf+
++                   # 2 way
++                   sex:field_season + sex:condition+
++                   #random effects
++                   (1|transect)+(1|tree_code)+(1|year), 
++                   REML = FALSE,data=bidat, na.action = na.omit)
+> AIC(bimodelsex) 
+[1] 7081.693
+> BIC(bimodelsex) 
+[1] 7221.171
+> summary(bimodelsex)
+Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: photo ~ sex + par + field_season + combined_caliper + condition +      RH_S + time_clean + VpdL + Tleaf + sex:field_season + sex:condition +  
+    (1 | transect) + (1 | tree_code) + (1 | year)
+   Data: bidat
+
+     AIC      BIC   logLik deviance df.resid 
+  7081.7   7221.2  -3516.8   7033.7     2445 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.2926 -0.6438  0.0313  0.6330  3.6102 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ tree_code (Intercept) 0.18853  0.4342  
+ transect  (Intercept) 0.52273  0.7230  
+ year      (Intercept) 0.02398  0.1549  
+ Residual              0.91382  0.9559  
+Number of obs: 2469, groups:  tree_code, 135; transect, 14; year, 3
+
+Fixed effects:
+                          Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)              1.426e+00  5.632e-01  5.063e+02   2.531  0.01167 *  
+sexF                    -3.037e-01  4.280e-01  5.630e+02  -0.710  0.47831    
+sexM                    -5.618e-01  3.265e-01  1.147e+03  -1.721  0.08556 .  
+sexN                    -9.391e-01  3.267e-01  1.178e+03  -2.874  0.00412 ** 
+par500                   8.418e-01  5.529e-02  2.312e+03  15.225  < 2e-16 ***
+par1000                  1.116e+00  5.961e-02  2.336e+03  18.719  < 2e-16 ***
+par1500                  1.275e+00  6.851e-02  2.369e+03  18.605  < 2e-16 ***
+field_seasonsummer      -1.883e+00  1.304e-01  2.417e+03 -14.438  < 2e-16 ***
+combined_caliper        -1.918e-02  1.262e-02  1.901e+02  -1.520  0.13024    
+condition               -1.871e-01  9.689e-02  1.272e+03  -1.931  0.05373 .  
+RH_S                    -3.127e-04  6.308e-03  2.434e+03  -0.050  0.96046    
+time_clean               3.479e-01  3.939e-01  2.444e+03   0.883  0.37717    
+VpdL                    -1.492e+00  3.114e-01  2.447e+03  -4.791 1.76e-06 ***
+Tleaf                    1.792e-01  1.766e-02  2.413e+03  10.150  < 2e-16 ***
+sexF:field_seasonsummer  4.439e-01  1.797e-01  2.392e+03   2.471  0.01355 *  
+sexM:field_seasonsummer  6.791e-01  1.385e-01  2.401e+03   4.903 1.01e-06 ***
+sexN:field_seasonsummer  8.189e-01  1.399e-01  2.402e+03   5.853 5.49e-09 ***
+sexF:condition          -1.718e-02  1.388e-01  6.125e+02  -0.124  0.90155    
+sexM:condition           1.414e-01  1.051e-01  1.224e+03   1.345  0.17874    
+sexN:condition           1.817e-01  1.090e-01  1.237e+03   1.667  0.09571 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation matrix not shown by default, as p = 20 > 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it
+
+> anova(bimodelsex)
+Type III Analysis of Variance Table with Satterthwaite's method
+                 Sum Sq Mean Sq NumDF   DenDF  F value    Pr(>F)    
+sex                9.00    3.00     3  515.19   3.2841   0.02064 *  
+par              409.92  136.64     3 2329.46 149.5261 < 2.2e-16 ***
+field_season     486.11  486.11     1 2394.02 531.9564 < 2.2e-16 ***
+combined_caliper   2.11    2.11     1  190.13   2.3096   0.13024    
+condition          5.67    5.67     1  332.78   6.2013   0.01325 *  
+RH_S               0.00    0.00     1 2434.06   0.0025   0.96046    
+time_clean         0.71    0.71     1 2444.16   0.7802   0.37717    
+VpdL              20.98   20.98     1 2446.52  22.9560 1.757e-06 ***
+Tleaf             94.15   94.15     1 2413.15 103.0312 < 2.2e-16 ***
+sex:field_season  33.86   11.29     3 2370.26  12.3497 5.146e-08 ***
+sex:condition      4.04    1.35     3  612.70   1.4744   0.22039    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+> bimodelsex <-lmer(photo ~ sex+par+field_season+combined_caliper+condition+RH_S+time_clean+VpdL+Tleaf+
++                   # 2 way
++                   sex:field_season + 
++                   #random effects
++                   (1|transect)+(1|tree_code)+(1|year), 
++                   REML = FALSE,data=bidat, na.action = na.omit)
+> AIC(bimodelsex) 
+[1] 7080.091
+> BIC(bimodelsex) 
+[1] 7202.134
+> anova(bimodelsex)
+Type III Analysis of Variance Table with Satterthwaite's method
+                 Sum Sq Mean Sq NumDF   DenDF  F value    Pr(>F)    
+sex               14.63    4.88     3  474.98   5.3198  0.001298 ** 
+par              408.32  136.11     3 2331.30 148.5209 < 2.2e-16 ***
+field_season     493.84  493.84     1 2392.62 538.8944 < 2.2e-16 ***
+combined_caliper   0.91    0.91     1  163.29   0.9967  0.319584    
+condition          2.73    2.73     1  270.08   2.9798  0.085455 .  
+RH_S               0.01    0.01     1 2429.23   0.0060  0.938043    
+time_clean         0.73    0.73     1 2443.59   0.7935  0.373121    
+VpdL              20.37   20.37     1 2441.96  22.2293 2.556e-06 ***
+Tleaf             94.26   94.26     1 2411.78 102.8546 < 2.2e-16 ***
+sex:field_season  35.02   11.67     3 2374.28  12.7386 2.940e-08 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> summary(bimodelsex)
+Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: photo ~ sex + par + field_season + combined_caliper + condition +      RH_S + time_clean + VpdL + Tleaf + sex:field_season + (1 |  
+    transect) + (1 | tree_code) + (1 | year)
+   Data: bidat
+
+     AIC      BIC   logLik deviance df.resid 
+  7080.1   7202.1  -3519.0   7038.1     2448 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.2940 -0.6421  0.0365  0.6336  3.6366 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ tree_code (Intercept) 0.18478  0.4299  
+ transect  (Intercept) 0.51010  0.7142  
+ year      (Intercept) 0.02296  0.1515  
+ Residual              0.91640  0.9573  
+Number of obs: 2469, groups:  tree_code, 135; transect, 14; year, 3
+
+Fixed effects:
+                          Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)              9.408e-01  4.725e-01  3.054e+02   1.991   0.0474 *  
+sexF                    -3.563e-01  1.751e-01  6.995e+02  -2.035   0.0422 *  
+sexM                    -1.389e-01  1.350e-01  1.033e+03  -1.030   0.3035    
+sexN                    -4.644e-01  1.468e-01  1.014e+03  -3.164   0.0016 ** 
+par500                   8.406e-01  5.536e-02  2.316e+03  15.183  < 2e-16 ***
+par1000                  1.113e+00  5.965e-02  2.338e+03  18.652  < 2e-16 ***
+par1500                  1.269e+00  6.848e-02  2.366e+03  18.533  < 2e-16 ***
+field_seasonsummer      -1.901e+00  1.301e-01  2.423e+03 -14.617  < 2e-16 ***
+combined_caliper        -1.166e-02  1.168e-02  1.633e+02  -0.998   0.3196    
+condition               -6.260e-02  3.626e-02  2.701e+02  -1.726   0.0855 .  
+RH_S                     4.885e-04  6.284e-03  2.429e+03   0.078   0.9380    
+time_clean               3.509e-01  3.940e-01  2.444e+03   0.891   0.3731    
+VpdL                    -1.462e+00  3.102e-01  2.442e+03  -4.715 2.56e-06 ***
+Tleaf                    1.784e-01  1.759e-02  2.412e+03  10.142  < 2e-16 ***
+sexF:field_seasonsummer  4.588e-01  1.794e-01  2.396e+03   2.557   0.0106 *  
+sexM:field_seasonsummer  6.931e-01  1.383e-01  2.408e+03   5.013 5.76e-07 ***
+sexN:field_seasonsummer  8.319e-01  1.396e-01  2.407e+03   5.957 2.94e-09 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+> bimodelsex <-lmer(photo ~ sex+par+field_season+combined_caliper+condition+time_clean+VpdL+Tleaf+
++                   # 2 way
++                   sex:field_season + sex:condition+
++                   #random effects
++                   (1|transect)+(1|tree_code)+(1|year), 
++                   REML = FALSE,data=bidat, na.action = na.omit)
+> AIC(bimodelsex) 
+[1] 7079.695
+> BIC(bimodelsex) 
+[1] 7213.361
+> anova(bimodelsex)
+Type III Analysis of Variance Table with Satterthwaite's method
+                 Sum Sq Mean Sq NumDF   DenDF  F value    Pr(>F)    
+sex                9.00    3.00     3  517.83   3.2844   0.02062 *  
+par              554.22  184.74     3 2312.23 202.1553 < 2.2e-16 ***
+field_season     486.15  486.15     1 2394.66 531.9802 < 2.2e-16 ***
+combined_caliper   2.11    2.11     1  191.14   2.3109   0.13012    
+condition          5.67    5.67     1  335.42   6.2055   0.01322 *  
+time_clean         0.73    0.73     1 2434.42   0.7962   0.37232    
+VpdL             107.18  107.18     1 2466.20 117.2868 < 2.2e-16 ***
+Tleaf            259.79  259.79     1 2430.15 284.2847 < 2.2e-16 ***
+sex:field_season  33.96   11.32     3 2370.81  12.3864 4.881e-08 ***
+sex:condition      4.04    1.35     3  617.35   1.4749   0.22022    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> summary(bimodelsex)
+Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: photo ~ sex + par + field_season + combined_caliper + condition +      time_clean + VpdL + Tleaf + sex:field_season + sex:condition +  
+    (1 | transect) + (1 | tree_code) + (1 | year)
+   Data: bidat
+
+     AIC      BIC   logLik deviance df.resid 
+  7079.7   7213.4  -3516.8   7033.7     2446 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.2928 -0.6438  0.0311  0.6323  3.6112 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ tree_code (Intercept) 0.18839  0.4340  
+ transect  (Intercept) 0.52257  0.7229  
+ year      (Intercept) 0.02404  0.1550  
+ Residual              0.91385  0.9560  
+Number of obs: 2469, groups:  tree_code, 135; transect, 14; year, 3
+
+Fixed effects:
+                          Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                1.40810    0.43949  216.57520   3.204  0.00156 ** 
+sexF                      -0.30252    0.42735  563.46870  -0.708  0.47930    
+sexM                      -0.56064    0.32555 1151.25308  -1.722  0.08532 .  
+sexN                      -0.93766    0.32552 1181.09564  -2.881  0.00404 ** 
+par500                     0.84136    0.05446 2307.47905  15.450  < 2e-16 ***
+par1000                    1.11475    0.05513 2311.69401  20.222  < 2e-16 ***
+par1500                    1.27267    0.05675 2320.65130  22.425  < 2e-16 ***
+field_seasonsummer        -1.88260    0.13035 2417.69915 -14.442  < 2e-16 ***
+combined_caliper          -0.01918    0.01262  191.14412  -1.520  0.13012    
+condition                 -0.18656    0.09641 1291.81351  -1.935  0.05321 .  
+time_clean                 0.34398    0.38551 2434.42276   0.892  0.37232    
+VpdL                      -1.47803    0.13648 2466.20455 -10.830  < 2e-16 ***
+Tleaf                      0.17855    0.01059 2430.15332  16.861  < 2e-16 ***
+sexF:field_seasonsummer    0.44391    0.17968 2391.96494   2.471  0.01356 *  
+sexM:field_seasonsummer    0.67884    0.13842 2401.31323   4.904 1.00e-06 ***
+sexN:field_seasonsummer    0.81847    0.13968 2402.20936   5.859 5.28e-09 ***
+sexF:condition            -0.01763    0.13851  613.71220  -0.127  0.89876    
+sexM:condition             0.14085    0.10456 1241.56083   1.347  0.17820    
+sexN:condition             0.18118    0.10857 1248.16188   1.669  0.09542 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation matrix not shown by default, as p = 19 > 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it
+
+
+> bimodelsex <-lmer(photo ~ sex+par+field_season+condition+VpdL+Tleaf+ time_clean+
++                   # 2 way
++                   sex:field_season + 
++                   #random effects
++                   (1|transect)+(1|tree_code)+(1|year), 
++                   REML = FALSE,data=bidat, na.action = na.omit)
+> AIC(bimodelsex) 
+[1] 7077.085
+> BIC(bimodelsex) 
+[1] 7187.505
+> anova(bimodelsex)
+Type III Analysis of Variance Table with Satterthwaite's method
+                 Sum Sq Mean Sq NumDF   DenDF  F value    Pr(>F)    
+sex               14.73    4.91     3  439.54   5.3574  0.001244 ** 
+par              553.72  184.57     3 2315.74 201.3476 < 2.2e-16 ***
+field_season     494.56  494.56     1 2392.48 539.5035 < 2.2e-16 ***
+condition          2.86    2.86     1  273.95   3.1228  0.078317 .  
+VpdL             109.26  109.26     1 2465.40 119.1852 < 2.2e-16 ***
+Tleaf            266.78  266.78     1 2427.24 291.0211 < 2.2e-16 ***
+time_clean         0.80    0.80     1 2430.37   0.8678  0.351663    
+sex:field_season  35.29   11.76     3 2374.29  12.8335 2.564e-08 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> summary(bimodelsex)
+Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: photo ~ sex + par + field_season + condition + VpdL + Tleaf +  
+    time_clean + sex:field_season + (1 | transect) + (1 | tree_code) +      (1 | year)
+   Data: bidat
+
+     AIC      BIC   logLik deviance df.resid 
+  7077.1   7187.5  -3519.5   7039.1     2450 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.2940 -0.6444  0.0342  0.6299  3.6458 
+
+Random effects:
+ Groups    Name        Variance Std.Dev.
+ tree_code (Intercept) 0.18458  0.4296  
+ transect  (Intercept) 0.52580  0.7251  
+ year      (Intercept) 0.02267  0.1506  
+ Residual              0.91669  0.9574  
+Number of obs: 2469, groups:  tree_code, 135; transect, 14; year, 3
+
+Fixed effects:
+                          Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                0.88503    0.33493   81.42335   2.642  0.00987 ** 
+sexF                      -0.37492    0.17409  695.77864  -2.154  0.03161 *  
+sexM                      -0.12186    0.13377 1070.97212  -0.911  0.36252    
+sexN                      -0.43236    0.14314  966.54653  -3.021  0.00259 ** 
+par500                     0.84123    0.05454 2311.12944  15.424  < 2e-16 ***
+par1000                    1.11419    0.05521 2315.27377  20.181  < 2e-16 ***
+par1500                    1.27194    0.05684 2323.94256  22.379  < 2e-16 ***
+field_seasonsummer        -1.90514    0.12992 2422.55843 -14.664  < 2e-16 ***
+condition                 -0.06401    0.03622  273.95070  -1.767  0.07832 .  
+VpdL                      -1.48858    0.13635 2465.40271 -10.917  < 2e-16 ***
+Tleaf                      0.17995    0.01055 2427.23998  17.059  < 2e-16 ***
+time_clean                 0.35929    0.38569 2430.37258   0.932  0.35166    
+sexF:field_seasonsummer    0.46688    0.17927 2397.57424   2.604  0.00926 ** 
+sexM:field_seasonsummer    0.69554    0.13816 2408.45981   5.034 5.15e-07 ***
+sexN:field_seasonsummer    0.83463    0.13935 2407.58088   5.990 2.42e-09 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation matrix not shown by default, as p = 15 > 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it
+
+> bestbimodel<-bimodelsex2<-bimodelsex
+
+# the BIC implicitly makes it harder to find an effect as the sample size increases
+# As sample size increases, the penalty term in the Bayesian Information Criterion (BIC) becomes larger, meaning that the BIC will 
+#increasingly favor simpler models with fewer parameters, essentially making it more stringent in selecting a model as the data size grows; 
+# in simpler terms, with a larger sample size, BIC becomes more likely to choose a model with fewer parameters to avoid overfitting. 
