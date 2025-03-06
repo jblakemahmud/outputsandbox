@@ -477,6 +477,136 @@ Results are averaged over the levels of: par
 Degrees-of-freedom method: kenward-roger 
 P value adjustment: tukey method for comparing a family of 4 estimates 
 
+#does it make sense to include a condition by season interaction when condition can't vary by season?
+> fullmodel.5.1<-lmer(photo ~ sex+par+field_season+combined_caliper+conditionC+VpdL+Tleaf+time_clean+
++                     # 2 way
++                     sex:field_season + sex:conditionC +  
++                     #random effects
++                     (1|transect)+(1+ field_season+ VpdL|tree_code)+ (1|year), 
++                   REML=FALSE, data=monodat, na.action = na.omit, lmerControl(optimizer = "bobyqa" )) #sometimes helps in convergence compared to default
+> AIC(fullmodel.5.1) #6350.   (no RH - 6350) (No time 6422) (No RH and time 6423)
+[1] 6388.102
+> BIC (fullmodel.5.1) #6541 (no RH - 6536).  (No time 6608) (No time 6603)
+[1] 6550.621
+> anova(fullmodel.5.1) #only time and relative humidity are NS
+Type III Analysis of Variance Table with Satterthwaite's method
+                 Sum Sq Mean Sq NumDF   DenDF  F value    Pr(>F)    
+sex                9.49   3.165     3  605.07   5.5755 0.0008899 ***
+par              514.04 171.346     3 2049.13 301.8460 < 2.2e-16 ***
+field_season      97.97  97.970     1  188.06 172.5864 < 2.2e-16 ***
+combined_caliper   2.02   2.017     1  207.65   3.5535 0.0608170 .  
+conditionC         6.09   6.086     1  351.49  10.7203 0.0011650 ** 
+VpdL              37.74  37.742     1  171.58  66.4862 7.125e-14 ***
+Tleaf            250.63 250.629     1 2327.16 441.5133 < 2.2e-16 ***
+time_clean         0.83   0.834     1 2247.26   1.4686 0.2256879    
+sex:field_season  19.72   6.575     3  582.30  11.5826 2.205e-07 ***
+sex:conditionC     6.15   2.051     3  659.73   3.6133 0.0130976 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> summary(fullmodel.5.1)
+Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: photo ~ sex + par + field_season + combined_caliper + conditionC +  
+    VpdL + Tleaf + time_clean + sex:field_season + sex:conditionC +  
+    (1 | transect) + (1 + field_season + VpdL | tree_code) +      (1 | year)
+   Data: monodat
+Control: lmerControl(optimizer = "bobyqa")
+
+     AIC      BIC   logLik deviance df.resid 
+  6388.1   6550.6  -3166.1   6332.1     2423 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.9481 -0.5534  0.0019  0.5888  3.5340 
+
+Random effects:
+ Groups    Name               Variance Std.Dev. Corr       
+ tree_code (Intercept)        1.41949  1.1914              
+           field_seasonsummer 0.96574  0.9827   -0.27      
+           VpdL               3.06883  1.7518   -0.91  0.05
+ transect  (Intercept)        0.42618  0.6528              
+ year      (Intercept)        0.01295  0.1138              
+ Residual                     0.56766  0.7534              
+Number of obs: 2451, groups:  tree_code, 135; transect, 14; year, 3
+
+Fixed effects:
+                          Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)              1.510e+00  4.964e-01  3.972e+02   3.043 0.002501 ** 
+sexF                    -3.000e-01  5.437e-01  6.610e+02  -0.552 0.581255    
+sexM                    -7.377e-01  4.191e-01  1.054e+03  -1.760 0.078653 .  
+sexN                    -1.501e+00  4.184e-01  1.091e+03  -3.588 0.000348 ***
+par500                   8.307e-01  4.316e-02  2.012e+03  19.250  < 2e-16 ***
+par1000                  1.106e+00  4.411e-02  2.055e+03  25.080  < 2e-16 ***
+par1500                  1.257e+00  4.611e-02  2.124e+03  27.255  < 2e-16 ***
+field_seasonsummer      -2.168e+00  2.069e-01  4.611e+02 -10.480  < 2e-16 ***
+combined_caliper        -2.283e-02  1.211e-02  2.076e+02  -1.885 0.060817 .  
+conditionC              -2.217e-01  9.270e-02  1.204e+03  -2.392 0.016925 *  
+VpdL                    -1.730e+00  2.121e-01  1.716e+02  -8.154 7.13e-14 ***
+Tleaf                    2.059e-01  9.798e-03  2.327e+03  21.012  < 2e-16 ***
+time_clean               4.830e-01  3.985e-01  2.247e+03   1.212 0.225688    
+sexF:field_seasonsummer  9.511e-01  2.836e-01  6.283e+02   3.353 0.000846 ***
+sexM:field_seasonsummer  6.637e-01  2.141e-01  6.632e+02   3.100 0.002020 ** 
+sexN:field_seasonsummer  1.223e+00  2.272e-01  5.608e+02   5.385 1.07e-07 ***
+sexF:conditionC         -3.950e-02  1.350e-01  6.891e+02  -0.293 0.769937    
+sexM:conditionC          1.220e-01  9.990e-02  1.227e+03   1.222 0.222077    
+sexN:conditionC          2.414e-01  1.036e-01  1.183e+03   2.330 0.019976 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation matrix not shown by default, as p = 19 > 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it
+
+> # comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
+Warning message:
+In if (match < 0) { :
+  the condition has length > 1 and only the first element will be used
+> em.51<- emmeans(fullmodel.5.1, pairwise~sex|field_season*conditionC)  
+> # above averages over all condition types
+> summary(em.51)
+$emmeans
+field_season = spring, conditionC = 2.73:
+ sex emmean    SE   df lower.CL upper.CL
+ B     4.42 0.269 47.9     3.88     4.96
+ F     4.02 0.286 58.2     3.44     4.59
+ M     4.02 0.213 19.1     3.57     4.46
+ N     3.58 0.216 20.5     3.13     4.03
+
+field_season = summer, conditionC = 2.73:
+ sex emmean    SE   df lower.CL upper.CL
+ B     2.25 0.284 61.2     1.69     2.82
+ F     2.80 0.309 83.0     2.18     3.41
+ M     2.51 0.226 24.3     2.05     2.98
+ N     2.64 0.228 25.4     2.17     3.10
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 2.73:
+ contrast estimate     SE   df t.ratio p.value
+ B - F     0.40775 0.2374  656   1.718  0.3151
+ B - M     0.40482 0.1914  937   2.115  0.1491
+ B - N     0.84284 0.2018  892   4.176  0.0002
+ F - M    -0.00292 0.2098  308  -0.014  1.0000
+ F - N     0.43509 0.2208  354   1.970  0.2012
+ M - N     0.43801 0.0931  667   4.703  <.0001
+
+field_season = summer, conditionC = 2.73:
+ contrast estimate     SE   df t.ratio p.value
+ B - F    -0.54336 0.2760  835  -1.969  0.2008
+ B - M    -0.25889 0.2095 1261  -1.236  0.6043
+ B - N    -0.38055 0.2229 1176  -1.707  0.3205
+ F - M     0.28447 0.2468  492   1.153  0.6570
+ F - N     0.16282 0.2469  564   0.660  0.9122
+ M - N    -0.12165 0.1132 1195  -1.075  0.7052
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 4 estimates 
+
+
+
 
 
 ##########
@@ -855,6 +985,116 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 Error: object 'e' not found
 > bestwegot_simplesexes<-(fullmodel.simple5.3)
 
+> # Trying with simple sex
+# does it make sense to have a season by conditon interaction when condition can't change by season?
+> # remove three way interaction +RH_S, also field_season:conditionC +
+> fullmodel.simple5.5<-lmer(photo ~ simplesex+par+field_season+combined_caliper+conditionC+time_clean+VpdL+Tleaf+
++                             # 2 way
++                             simplesex:field_season + simplesex:conditionC +  
++                             #random effects
++                             (1|transect)+(1+ field_season+ VpdL|tree_code)+ (1|year), 
++                           REML=FALSE, data=monodat, na.action = na.omit, lmerControl(optimizer = "bobyqa" )) #sometimes helps in convergence compared to default
+> AIC(fullmodel.simple5.5) #6358
+[1] 6393.358
+> BIC(fullmodel.simple5.5) #6509
+[1] 6538.464
+> anova(fullmodel.simple5.5) 
+Type III Analysis of Variance Table with Satterthwaite's method
+                       Sum Sq Mean Sq NumDF   DenDF  F value    Pr(>F)    
+simplesex                9.32   4.662     2  769.67   8.1613 0.0003109 ***
+par                    515.94 171.978     3 2063.61 301.0821 < 2.2e-16 ***
+field_season           108.56 108.557     1  159.45 190.0500 < 2.2e-16 ***
+combined_caliper         2.32   2.320     1  203.61   4.0613 0.0451917 *  
+conditionC               4.78   4.776     1  323.62   8.3610 0.0040931 ** 
+time_clean               1.31   1.305     1 2259.51   2.2847 0.1307941    
+VpdL                    39.56  39.562     1  177.43  69.2614 2.234e-14 ***
+Tleaf                  251.64 251.639     1 2338.34 440.5436 < 2.2e-16 ***
+simplesex:field_season  13.30   6.650     2  582.87  11.6420 1.102e-05 ***
+simplesex:conditionC     5.61   2.803     2  811.41   4.9069 0.0076163 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> summary(fullmodel.simple5.5)
+Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: photo ~ simplesex + par + field_season + combined_caliper + conditionC +  
+    time_clean + VpdL + Tleaf + simplesex:field_season + simplesex:conditionC +  
+    (1 | transect) + (1 + field_season + VpdL | tree_code) +      (1 | year)
+   Data: monodat
+Control: lmerControl(optimizer = "bobyqa")
+
+     AIC      BIC   logLik deviance df.resid 
+  6393.4   6538.5  -3171.7   6343.4     2426 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.9254 -0.5532  0.0018  0.5791  3.5122 
+
+Random effects:
+ Groups    Name               Variance Std.Dev. Corr       
+ tree_code (Intercept)        1.40693  1.1861              
+           field_seasonsummer 0.97471  0.9873   -0.31      
+           VpdL               2.88658  1.6990   -0.90  0.08
+ transect  (Intercept)        0.43636  0.6606              
+ year      (Intercept)        0.01315  0.1147              
+ Residual                     0.57120  0.7558              
+Number of obs: 2451, groups:  tree_code, 135; transect, 14; year, 3
+
+Fixed effects:
+                                Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                    1.319e+00  4.549e-01  2.849e+02   2.899 0.004034 ** 
+simplesexM                    -5.830e-01  3.553e-01  5.200e+02  -1.641 0.101459    
+simplesexN                    -1.333e+00  3.515e-01  5.599e+02  -3.793 0.000165 ***
+par500                         8.312e-01  4.329e-02  2.027e+03  19.201  < 2e-16 ***
+par1000                        1.107e+00  4.424e-02  2.069e+03  25.032  < 2e-16 ***
+par1500                        1.259e+00  4.623e-02  2.136e+03  27.233  < 2e-16 ***
+field_seasonsummer            -1.760e+00  1.694e-01  3.175e+02 -10.389  < 2e-16 ***
+combined_caliper              -2.401e-02  1.192e-02  2.036e+02  -2.015 0.045192 *  
+conditionC                    -2.324e-01  7.388e-02  5.840e+02  -3.146 0.001740 ** 
+time_clean                     6.014e-01  3.978e-01  2.260e+03   1.512 0.130794    
+VpdL                          -1.736e+00  2.086e-01  1.774e+02  -8.322 2.23e-14 ***
+Tleaf                          2.057e-01  9.799e-03  2.338e+03  20.989  < 2e-16 ***
+simplesexM:field_seasonsummer  2.813e-01  1.838e-01  5.002e+02   1.530 0.126532    
+simplesexN:field_seasonsummer  8.039e-01  1.916e-01  4.477e+02   4.195 3.29e-05 ***
+simplesexM:conditionC          1.308e-01  8.559e-02  6.658e+02   1.528 0.126996    
+simplesexN:conditionC          2.470e-01  8.577e-02  7.438e+02   2.880 0.004093 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation matrix not shown by default, as p = 16 > 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it
+
+> emsimple.55<- emmeans(fullmodel.simple5.5, pairwise~simplesex|field_season*conditionC)  
+> summary(emsimple.55)
+$emmeans
+field_season = spring, conditionC = 2.73:
+ simplesex emmean    SE   df lower.CL upper.CL
+ F           4.25 0.252 35.8     3.73     4.76
+ M           4.02 0.216 19.2     3.57     4.47
+ N           3.59 0.219 20.6     3.13     4.04
+
+field_season = summer, conditionC = 2.73:
+ simplesex emmean    SE   df lower.CL upper.CL
+ F           2.49 0.262 43.0     1.96     3.01
+ M           2.54 0.227 23.8     2.07     3.01
+ N           2.63 0.229 24.8     2.16     3.10
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 2.73:
+ contrast estimate     SE   df t.ratio p.value
+ F - M      0.2262 0.1629  484   1.389  0.3474
+ F - N      0.6595 0.1751  535   3.767  0.0005
+ M - N      0.4332 0.0933  721   4.642  <.0001
+
+field_season = summer, conditionC = 2.73:
+ contrast estimate     SE   df t.ratio p.value
+ F - M     -0.0551 0.1789  753  -0.308  0.9491
+ F - N     -0.1444 0.1875  830  -0.770  0.7214
+ M - N     -0.0894 0.1109 1234  -0.805  0.6998
+
 
 > # comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
 > emsimple5<- emmeans(fullmodel.simple5.3, pairwise~simplesex|field_season*conditionC)  
@@ -1210,3 +1450,146 @@ field_season = summer:
 Results are averaged over the levels of: par 
 Degrees-of-freedom method: kenward-roger 
 P value adjustment: tukey method for comparing a family of 3 estimates 
+
+> ###### just checking
+> reducedmodel<-lmer(photo ~ sex+par+field_season+combined_caliper+conditionC+
++                   # 2 way
++                   sex:field_season + sex:conditionC +
++                   #random effects
++                   (1|transect)+(1+ field_season+ VpdL|tree_code)+ (1|year), 
++                 REML=FALSE, data=monodat, na.action = na.omit)
+> AIC(reducedmodel) #6889 (#6386 without  + sex:combined_caliper #6384 with three 2-way interactions
+[1] 6889.078
+> BIC(reducedmodel)  #7034 (#6554 without + sex:combined_caliper #6570 with three 2-way interactions
+[1] 7034.388
+> anova(reducedmodel) 
+Type III Analysis of Variance Table with Satterthwaite's method
+                 Sum Sq Mean Sq NumDF   DenDF  F value    Pr(>F)    
+sex               16.07   5.355     3  615.78   7.6363 5.106e-05 ***
+par              587.53 195.843     3 2074.14 279.2541 < 2.2e-16 ***
+field_season      30.40  30.401     1  152.71  43.3486 6.946e-10 ***
+combined_caliper   6.10   6.098     1  198.88   8.6945 0.0035739 ** 
+conditionC        10.06  10.059     1  333.24  14.3433 0.0001807 ***
+sex:field_season  16.07   5.358     3  549.73   7.6398 5.195e-05 ***
+sex:conditionC    10.36   3.453     3  649.96   4.9237 0.0021750 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> summary(reducedmodel) 
+Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: photo ~ sex + par + field_season + combined_caliper + conditionC +  
+    sex:field_season + sex:conditionC + (1 | transect) + (1 +      field_season + VpdL | tree_code) + (1 | year)
+   Data: monodat
+
+     AIC      BIC   logLik deviance df.resid 
+  6889.1   7034.4  -3419.5   6839.1     2446 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.5891 -0.5318 -0.0092  0.5379  3.9752 
+
+Random effects:
+ Groups    Name               Variance Std.Dev. Corr       
+ tree_code (Intercept)        1.34129  1.1581              
+           field_seasonsummer 0.98383  0.9919   -0.38      
+           VpdL               2.69035  1.6402   -0.87  0.09
+ transect  (Intercept)        0.40656  0.6376              
+ year      (Intercept)        0.03809  0.1952              
+ Residual                     0.70131  0.8374              
+Number of obs: 2471, groups:  tree_code, 135; transect, 14; year, 3
+
+Fixed effects:
+                          Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                3.45315    0.26533   30.54876  13.014 5.34e-14 ***
+sexB                      -0.14986    0.43685 1088.30388  -0.343  0.73163    
+sexF                       1.11826    0.51197  278.23177   2.184  0.02978 *  
+sexN                      -0.82841    0.16572 1095.87896  -4.999 6.72e-07 ***
+par500                     0.84822    0.04768 2018.39332  17.792  < 2e-16 ***
+par1000                    1.14231    0.04829 2082.22089  23.655  < 2e-16 ***
+par1500                    1.31457    0.04969 2164.23470  26.453  < 2e-16 ***
+field_seasonsummer        -1.00355    0.12367  193.16885  -8.115 5.56e-14 ***
+combined_caliper          -0.03785    0.01284  198.88396  -2.949  0.00357 ** 
+conditionC                -0.08833    0.04872  308.92400  -1.813  0.07077 .  
+sexB:field_seasonsummer   -0.01635    0.21586  711.25906  -0.076  0.93965    
+sexF:field_seasonsummer    0.51866    0.26604  380.58700   1.950  0.05196 .  
+sexN:field_seasonsummer    0.65503    0.14351  720.27978   4.564 5.89e-06 ***
+sexB:conditionC           -0.01576    0.10587 1187.24650  -0.149  0.88170    
+sexF:conditionC           -0.39323    0.12764  332.23388  -3.081  0.00224 ** 
+sexN:conditionC            0.07222    0.06009  805.39312   1.202  0.22981    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation matrix not shown by default, as p = 16 > 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it
+
+> AIC(reducedmodelsimple) #6889 (#6386 without  + sex:combined_caliper #6384 with three 2-way interactions
+Error in h(simpleError(msg, call)) : 
+  error in evaluating the argument 'object' in selecting a method for function 'AIC': object 'reducedmodelsimple' not found
+> ###### just checking
+> reducedmodelsimple<-lmer(photo ~ simplesex+par+field_season+combined_caliper+conditionC+
++                      # 2 way
++                      simplesex:field_season + simplesex:conditionC +
++                      #random effects
++                      (1|transect)+(1+ field_season+ VpdL|tree_code)+ (1|year), 
++                    REML=FALSE, data=monodat, na.action = na.omit)
+> AIC(reducedmodelsimple) #6889 (#6386 without  + sex:combined_caliper #6384 with three 2-way interactions
+[1] 6892.959
+> BIC(reducedmodelsimple)  #7034 (#6554 without + sex:combined_caliper #6570 with three 2-way interactions
+[1] 7020.831
+> anova(reducedmodelsimple) 
+Type III Analysis of Variance Table with Satterthwaite's method
+                       Sum Sq Mean Sq NumDF   DenDF  F value    Pr(>F)    
+simplesex               10.96   5.480     2  736.26   7.7466 0.0004684 ***
+par                    590.13 196.711     3 2090.52 278.0610 < 2.2e-16 ***
+field_season            37.97  37.974     1  124.55  53.6783 2.596e-11 ***
+combined_caliper         4.72   4.717     1  193.13   6.6677 0.0105576 *  
+conditionC               7.29   7.288     1  299.18  10.3020 0.0014733 ** 
+simplesex:field_season  13.54   6.772     2  557.73   9.5722 8.177e-05 ***
+simplesex:conditionC     5.35   2.675     2  771.71   3.7817 0.0232075 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> summary(reducedmodelsimple) 
+Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: photo ~ simplesex + par + field_season + combined_caliper + conditionC +  
+    simplesex:field_season + simplesex:conditionC + (1 | transect) +  
+    (1 + field_season + VpdL | tree_code) + (1 | year)
+   Data: monodat
+
+     AIC      BIC   logLik deviance df.resid 
+  6893.0   7020.8  -3424.5   6849.0     2449 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.5747 -0.5311 -0.0083  0.5365  3.9733 
+
+Random effects:
+ Groups    Name               Variance Std.Dev. Corr       
+ tree_code (Intercept)        1.30737  1.1434              
+           field_seasonsummer 0.97240  0.9861   -0.40      
+           VpdL               2.52789  1.5899   -0.87  0.12
+ transect  (Intercept)        0.42324  0.6506              
+ year      (Intercept)        0.03568  0.1889              
+ Residual                     0.70744  0.8411              
+Number of obs: 2471, groups:  tree_code, 135; transect, 14; year, 3
+
+Fixed effects:
+                                Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                      3.42218    0.26529   30.92226  12.900 5.54e-14 ***
+simplesexF                       0.36604    0.36951  523.51664   0.991   0.3223    
+simplesexN                      -0.82474    0.16416 1157.29432  -5.024 5.86e-07 ***
+par500                           0.84864    0.04788 2035.83111  17.725  < 2e-16 ***
+par1000                          1.14322    0.04848 2098.53795  23.581  < 2e-16 ***
+par1500                          1.31652    0.04985 2177.22803  26.408  < 2e-16 ***
+field_seasonsummer              -0.97727    0.12272  198.04216  -7.963 1.28e-13 ***
+combined_caliper                -0.03211    0.01243  193.13225  -2.582   0.0106 *  
+conditionC                      -0.09594    0.04799  330.35282  -1.999   0.0464 *  
+simplesexF:field_seasonsummer    0.17498    0.18651  502.86780   0.938   0.3486    
+simplesexN:field_seasonsummer    0.62170    0.14269  731.72783   4.357 1.51e-05 ***
+simplesexF:conditionC           -0.16498    0.09002  632.36605  -1.833   0.0673 .  
+simplesexN:conditionC            0.08110    0.05882  952.94972   1.379   0.1683    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation matrix not shown by default, as p = 13 > 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it
