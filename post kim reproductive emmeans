@@ -1,0 +1,649 @@
+#remove 3 way, remove sex:combined_caliper+ remove + sex:conditionC + remove +RH_S
+rmodel.5 <-lmer(photo ~ sex+par+field_season+combined_caliper+conditionC+VpdL+Tleaf+time_clean+
+                  # 2 way
+                  sex:field_season + field_season:conditionC +
+                  #random effects
+                  (1|transect)+(1+ field_season+VpdL|tree_code)+ (1|year), 
+                REML=FALSE, data=reproductives, na.action = na.omit)
+
+
+AIC(rmodel.5) #3896
+BIC(rmodel.5) #4024
+anova(rmodel.5) 
+summary(rmodel.5) 
+
+# comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
+emrep<- emmeans(rmodel.5, pairwise~sex|field_season*conditionC)  
+# above averages over all condition types
+summary(emrep)
+
+# above averages over all condition types
+> summary(emrep)
+$emmeans
+field_season = spring, conditionC = 3.09:
+ sex emmean    SE    df lower.CL upper.CL
+ M     3.95 0.179  17.5     3.57     4.32
+ B     4.21 0.210  33.0     3.78     4.64
+ F     3.79 0.226  42.7     3.34     4.25
+
+field_season = summer, conditionC = 3.09:
+ sex emmean    SE    df lower.CL upper.CL
+ M     2.55 0.220  39.0     2.11     2.99
+ B     2.08 0.253  68.1     1.58     2.59
+ F     2.41 0.313 122.4     1.79     3.03
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 3.09:
+ contrast estimate    SE  df t.ratio p.value
+ M - B      -0.266 0.146 530  -1.816  0.1653
+ M - F       0.152 0.174 178   0.872  0.6586
+ B - F       0.418 0.187 289   2.233  0.0674
+
+field_season = summer, conditionC = 3.09:
+ contrast estimate    SE  df t.ratio p.value
+ M - B       0.468 0.195 800   2.404  0.0434
+ M - F       0.141 0.292 283   0.482  0.8801
+ B - F      -0.327 0.289 394  -1.132  0.4948
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 3 estimates 
+
+# comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
+emr5.0<- emmeans(rmodel.5, pairwise~sex|field_season*conditionC, at= list(conditionC = 0)) 
+emr5.1<- emmeans(rmodel.5, pairwise~sex|field_season*conditionC, at= list(conditionC = 1)) 
+emr5.2<- emmeans(rmodel.5, pairwise~sex|field_season*conditionC, at= list(conditionC = 2)) 
+emr5.3<- emmeans(rmodel.5, pairwise~sex|field_season*conditionC, at= list(conditionC = 3)) 
+emr5.4<- emmeans(rmodel.5, pairwise~sex|field_season*conditionC, at= list(conditionC = 4)) 
+emr5.5<- emmeans(rmodel.5, pairwise~sex|field_season*conditionC, at= list(conditionC = 5)) 
+# above looks at one level of condition
+summary(emr5.0)
+summary(emr5.1)
+summary(emr5.2)
+summary(emr5.3)
+summary(emr5.4)
+summary(emr5.5)
+
+> summary(emr5.0)
+$emmeans
+field_season = spring, conditionC = 0:
+ sex emmean    SE    df lower.CL upper.CL
+ M     4.23 0.239  47.5     3.75     4.71
+ B     4.50 0.276  83.6     3.95     5.05
+ F     4.08 0.292  93.7     3.50     4.66
+
+field_season = summer, conditionC = 0:
+ sex emmean    SE    df lower.CL upper.CL
+ M     4.38 0.331 135.1     3.73     5.04
+ B     3.91 0.370 220.4     3.18     4.64
+ F     4.24 0.423 248.8     3.41     5.07
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 0:
+ contrast estimate    SE  df t.ratio p.value
+ M - B      -0.266 0.146 530  -1.816  0.1653
+ M - F       0.152 0.174 178   0.872  0.6586
+ B - F       0.418 0.187 289   2.233  0.0674
+
+field_season = summer, conditionC = 0:
+ contrast estimate    SE  df t.ratio p.value
+ M - B       0.468 0.195 800   2.404  0.0434
+ M - F       0.141 0.292 283   0.482  0.8801
+ B - F      -0.327 0.289 394  -1.132  0.4948
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 3 estimates 
+
+> summary(emr5.1)
+$emmeans
+field_season = spring, conditionC = 1:
+ sex emmean    SE    df lower.CL upper.CL
+ M     4.14 0.206  29.1     3.72     4.56
+ B     4.40 0.244  56.4     3.92     4.89
+ F     3.99 0.261  68.3     3.47     4.51
+
+field_season = summer, conditionC = 1:
+ sex emmean    SE    df lower.CL upper.CL
+ M     3.79 0.274  80.1     3.24     4.33
+ B     3.32 0.314 142.3     2.70     3.94
+ F     3.65 0.371 193.9     2.91     4.38
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 1:
+ contrast estimate    SE  df t.ratio p.value
+ M - B      -0.266 0.146 530  -1.816  0.1653
+ M - F       0.152 0.174 178   0.872  0.6586
+ B - F       0.418 0.187 289   2.233  0.0674
+
+field_season = summer, conditionC = 1:
+ contrast estimate    SE  df t.ratio p.value
+ M - B       0.468 0.195 800   2.404  0.0434
+ M - F       0.141 0.292 283   0.482  0.8801
+ B - F      -0.327 0.289 394  -1.132  0.4948
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 3 estimates 
+
+> summary(emr5.2)
+$emmeans
+field_season = spring, conditionC = 2:
+ sex emmean    SE    df lower.CL upper.CL
+ M     4.05 0.185  19.7     3.66     4.43
+ B     4.31 0.221  40.0     3.87     4.76
+ F     3.89 0.238  51.1     3.42     4.37
+
+field_season = summer, conditionC = 2:
+ sex emmean    SE    df lower.CL upper.CL
+ M     3.19 0.234  47.7     2.72     3.66
+ B     2.73 0.272  89.9     2.19     3.27
+ F     3.05 0.333 148.3     2.40     3.71
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 2:
+ contrast estimate    SE  df t.ratio p.value
+ M - B      -0.266 0.146 530  -1.816  0.1653
+ M - F       0.152 0.174 178   0.872  0.6586
+ B - F       0.418 0.187 289   2.233  0.0674
+
+field_season = summer, conditionC = 2:
+ contrast estimate    SE  df t.ratio p.value
+ M - B       0.468 0.195 800   2.404  0.0434
+ M - F       0.141 0.292 283   0.482  0.8801
+ B - F      -0.327 0.289 394  -1.132  0.4948
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 3 estimates 
+
+> summary(emr5.3)
+$emmeans
+field_season = spring, conditionC = 3:
+ sex emmean    SE    df lower.CL upper.CL
+ M     3.95 0.179  17.4     3.58     4.33
+ B     4.22 0.211  33.2     3.79     4.65
+ F     3.80 0.227  43.0     3.34     4.26
+
+field_season = summer, conditionC = 3:
+ sex emmean    SE    df lower.CL upper.CL
+ M     2.60 0.220  38.8     2.16     3.05
+ B     2.13 0.253  68.6     1.63     2.64
+ F     2.46 0.313 123.4     1.84     3.08
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 3:
+ contrast estimate    SE  df t.ratio p.value
+ M - B      -0.266 0.146 530  -1.816  0.1653
+ M - F       0.152 0.174 178   0.872  0.6586
+ B - F       0.418 0.187 289   2.233  0.0674
+
+field_season = summer, conditionC = 3:
+ contrast estimate    SE  df t.ratio p.value
+ M - B       0.468 0.195 800   2.404  0.0434
+ M - F       0.141 0.292 283   0.482  0.8801
+ B - F      -0.327 0.289 394  -1.132  0.4948
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 3 estimates 
+
+> summary(emr5.4)
+$emmeans
+field_season = spring, conditionC = 4:
+ sex emmean    SE    df lower.CL upper.CL
+ M     3.86 0.189  21.7     3.47     4.25
+ B     4.13 0.213  34.8     3.69     4.56
+ F     3.71 0.228  43.5     3.25     4.17
+
+field_season = summer, conditionC = 4:
+ sex emmean    SE    df lower.CL upper.CL
+ M     2.01 0.237  51.9     1.53     2.48
+ B     1.54 0.261  74.2     1.02     2.06
+ F     1.87 0.316 122.4     1.24     2.49
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 4:
+ contrast estimate    SE  df t.ratio p.value
+ M - B      -0.266 0.146 530  -1.816  0.1653
+ M - F       0.152 0.174 178   0.872  0.6586
+ B - F       0.418 0.187 289   2.233  0.0674
+
+field_season = summer, conditionC = 4:
+ contrast estimate    SE  df t.ratio p.value
+ M - B       0.468 0.195 800   2.404  0.0434
+ M - F       0.141 0.292 283   0.482  0.8801
+ B - F      -0.327 0.289 394  -1.132  0.4948
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 3 estimates 
+
+> summary(emr5.5)
+$emmeans
+field_season = spring, conditionC = 5:
+ sex emmean    SE    df lower.CL upper.CL
+ M    3.770 0.212  34.0    3.338     4.20
+ B    4.036 0.230  44.5    3.573     4.50
+ F    3.618 0.242  52.2    3.132     4.10
+
+field_season = summer, conditionC = 5:
+ sex emmean    SE    df lower.CL upper.CL
+ M    1.415 0.279  92.3    0.861     1.97
+ B    0.948 0.294 104.4    0.365     1.53
+ F    1.275 0.339 143.1    0.604     1.95
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 5:
+ contrast estimate    SE  df t.ratio p.value
+ M - B      -0.266 0.146 530  -1.816  0.1653
+ M - F       0.152 0.174 178   0.872  0.6586
+ B - F       0.418 0.187 289   2.233  0.0674
+
+field_season = summer, conditionC = 5:
+ contrast estimate    SE  df t.ratio p.value
+ M - B       0.468 0.195 800   2.404  0.0434
+ M - F       0.141 0.292 283   0.482  0.8801
+ B - F      -0.327 0.289 394  -1.132  0.4948
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 3 estimates 
+
+# like emmeans but with continuous variables
+trendr5<-emtrends(rmodel.5, ~sex*field_season, var = "conditionC")
+# above 
+summary(trendr5)
+# to get pvalues
+test(trendr5)
+
+> # above 
+> summary(trendr5)
+ sex field_season conditionC.trend     SE  df lower.CL upper.CL
+ M   spring                -0.0923 0.0546 190   -0.200   0.0154
+ B   spring                -0.0923 0.0546 190   -0.200   0.0154
+ F   spring                -0.0923 0.0546 190   -0.200   0.0154
+ M   summer                -0.5930 0.0840 370   -0.758  -0.4277
+ B   summer                -0.5930 0.0840 370   -0.758  -0.4277
+ F   summer                -0.5930 0.0840 370   -0.758  -0.4277
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+> # to get pvalues
+> test(trendr5)
+ sex field_season conditionC.trend     SE  df t.ratio p.value
+ M   spring                -0.0923 0.0546 190  -1.690  0.0926
+ B   spring                -0.0923 0.0546 190  -1.690  0.0926
+ F   spring                -0.0923 0.0546 190  -1.690  0.0926
+ M   summer                -0.5930 0.0840 370  -7.056  <.0001
+ B   summer                -0.5930 0.0840 370  -7.056  <.0001
+ F   summer                -0.5930 0.0840 370  -7.056  <.0001
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+trendr5.pairwise<-emtrends(rmodel.5, pairwise~sex|field_season, var = "conditionC")
+# above 
+summary(trendr5.pairwise) # is there a sig effect of condit for each sex and season
+# to get pvalues
+test(trendr5.pairwise) # is the effect of condition sig diff based on sex
+
+###                                                                                         ERRORS                  ERRORS                     ERRORS
+> # above 
+> summary(trendr5.pairwise) # is there a sig effect of condit for each sex and season
+Error in solve.default(L %*% V0 %*% t(L), L) : 
+  Lapack routine dgesv: system is exactly singular: U[1,1] = 0
+> # to get pvalues
+> test(trendr5.pairwise) # is the effect of condition sig diff based on sex
+Error in solve.default(L %*% V0 %*% t(L), L) : 
+  Lapack routine dgesv: system is exactly singular: U[1,1] = 0
+
+
+#this model matches with what is going on out in the woods
+MFrmodel.2 <-lmer(photo ~ simplesex+par+field_season+combined_caliper+conditionC+time_clean+VpdL+Tleaf+
+                    # 2 way
+                    simplesex:field_season + field_season:conditionC+
+                    #random effects
+                    (1|transect)+(1+ field_season+VpdL|tree_code)+ (1|year), 
+                  REML=FALSE, data=reproductives, na.action = na.omit, lmerControl(optimizer = "bobyqa" )) 
+#sometimes helps in convergence compared to default)
+
+AIC(MFrmodel.2) #3899
+BIC(MFrmodel.2) #4016
+anova(MFrmodel.2) 
+summary(MFrmodel.2) 
+
+# comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
+emrepMF<- emmeans(MFrmodel.2, pairwise~simplesex|field_season*conditionC)  
+# above averages over all condition types
+summary(emrepMF)
+# borderline diff in BF in spring; MB in summer
+
+  
+> # comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
+> emrepMF<- emmeans(MFrmodel.2, pairwise~simplesex|field_season*conditionC)  
+> # resunlts from emmeans of rmodel.5 
+> 
+> 
+> 
+> # above averages over all condition types
+> summary(emrepMF)
+$emmeans
+field_season = spring, conditionC = 3.09:
+ simplesex emmean    SE   df lower.CL upper.CL
+ M           3.94 0.180 18.1     3.56     4.32
+ F           4.05 0.198 26.4     3.65     4.46
+
+field_season = summer, conditionC = 3.09:
+ simplesex emmean    SE   df lower.CL upper.CL
+ M           2.58 0.216 37.6     2.14     3.02
+ F           2.20 0.235 52.5     1.73     2.67
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 3.09:
+ contrast estimate    SE  df t.ratio p.value
+ M - F      -0.115 0.132 339  -0.871  0.3845
+
+field_season = summer, conditionC = 3.09:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.382 0.183 568   2.089  0.0372
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+
+# comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
+emsimpleMF2.0<- emmeans(MFrmodel.2, pairwise~simplesex|field_season*conditionC, at= list(conditionC = 0)) 
+emsimpleMF2.1<- emmeans(MFrmodel.2, pairwise~simplesex|field_season*conditionC, at= list(conditionC = 1)) 
+emsimpleMF2.2<- emmeans(MFrmodel.2, pairwise~simplesex|field_season*conditionC, at= list(conditionC = 2)) 
+emsimpleMF2.3<- emmeans(MFrmodel.2, pairwise~simplesex|field_season*conditionC, at= list(conditionC = 3)) 
+emsimpleMF2.4<- emmeans(MFrmodel.2, pairwise~simplesex|field_season*conditionC, at= list(conditionC = 4)) 
+emsimpleMF2.5<- emmeans(MFrmodel.2, pairwise~simplesex|field_season*conditionC, at= list(conditionC = 5)) 
+# above looks at one level of condition
+summary(emsimpleMF2.0)
+summary(emsimpleMF2.1)
+summary(emsimpleMF2.2)
+summary(emsimpleMF2.3)
+summary(emsimpleMF2.4)
+summary(emsimpleMF2.5)
+
+
+
+> summary(emsimpleMF2.0)
+$emmeans
+field_season = spring, conditionC = 0:
+ simplesex emmean    SE    df lower.CL upper.CL
+ M           4.23 0.243  51.2     3.75     4.72
+ F           4.35 0.271  79.3     3.81     4.89
+
+field_season = summer, conditionC = 0:
+ simplesex emmean    SE    df lower.CL upper.CL
+ M           4.36 0.328 132.5     3.71     5.00
+ F           3.97 0.360 201.4     3.27     4.68
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 0:
+ contrast estimate    SE  df t.ratio p.value
+ M - F      -0.115 0.132 339  -0.871  0.3845
+
+field_season = summer, conditionC = 0:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.382 0.183 568   2.089  0.0372
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emsimpleMF2.1)
+$emmeans
+field_season = spring, conditionC = 1:
+ simplesex emmean    SE    df lower.CL upper.CL
+ M           4.14 0.209  31.0     3.71     4.56
+ F           4.25 0.236  50.6     3.78     4.73
+
+field_season = summer, conditionC = 1:
+ simplesex emmean    SE    df lower.CL upper.CL
+ M           3.78 0.271  78.4     3.24     4.32
+ F           3.40 0.302 124.9     2.80     4.00
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 1:
+ contrast estimate    SE  df t.ratio p.value
+ M - F      -0.115 0.132 339  -0.871  0.3845
+
+field_season = summer, conditionC = 1:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.382 0.183 568   2.089  0.0372
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emsimpleMF2.2)
+$emmeans
+field_season = spring, conditionC = 2:
+ simplesex emmean    SE   df lower.CL upper.CL
+ M           4.04 0.186 20.5     3.65     4.43
+ F           4.16 0.211 33.5     3.73     4.59
+
+field_season = summer, conditionC = 2:
+ simplesex emmean    SE   df lower.CL upper.CL
+ M           3.21 0.230 46.3     2.74     3.67
+ F           2.82 0.258 74.0     2.31     3.34
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 2:
+ contrast estimate    SE  df t.ratio p.value
+ M - F      -0.115 0.132 339  -0.871  0.3845
+
+field_season = summer, conditionC = 2:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.382 0.183 568   2.089  0.0372
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emsimpleMF2.3)
+$emmeans
+field_season = spring, conditionC = 3:
+ simplesex emmean    SE   df lower.CL upper.CL
+ M           3.95 0.179 18.0     3.57     4.32
+ F           4.06 0.198 26.6     3.66     4.47
+
+field_season = summer, conditionC = 3:
+ simplesex emmean    SE   df lower.CL upper.CL
+ M           2.63 0.216 37.4     2.19     3.07
+ F           2.25 0.236 53.0     1.78     2.72
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 3:
+ contrast estimate    SE  df t.ratio p.value
+ M - F      -0.115 0.132 339  -0.871  0.3845
+
+field_season = summer, conditionC = 3:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.382 0.183 568   2.089  0.0372
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emsimpleMF2.4)
+$emmeans
+field_season = spring, conditionC = 4:
+ simplesex emmean    SE   df lower.CL upper.CL
+ M           3.85 0.190 22.5     3.46     4.24
+ F           3.97 0.201 27.9     3.55     4.38
+
+field_season = summer, conditionC = 4:
+ simplesex emmean    SE   df lower.CL upper.CL
+ M           2.06 0.233 50.0     1.59     2.52
+ F           1.68 0.242 56.8     1.19     2.16
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 4:
+ contrast estimate    SE  df t.ratio p.value
+ M - F      -0.115 0.132 339  -0.871  0.3845
+
+field_season = summer, conditionC = 4:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.382 0.183 568   2.089  0.0372
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emsimpleMF2.5)
+$emmeans
+field_season = spring, conditionC = 5:
+ simplesex emmean    SE   df lower.CL upper.CL
+ M           3.76 0.215 36.1    3.321     4.19
+ F           3.87 0.219 37.7    3.427     4.32
+
+field_season = summer, conditionC = 5:
+ simplesex emmean    SE   df lower.CL upper.CL
+ M           1.48 0.274 89.9    0.937     2.03
+ F           1.10 0.275 83.7    0.554     1.65
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 5:
+ contrast estimate    SE  df t.ratio p.value
+ M - F      -0.115 0.132 339  -0.871  0.3845
+
+field_season = summer, conditionC = 5:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.382 0.183 568   2.089  0.0372
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+# like emmeans but with continuous variables
+trendMFsimple2<-emtrends(MFrmodel.2, ~simplesex*field_season, var = "conditionC")
+# above 
+summary(trendMFsimple2)
+# to get pvalues
+test(trendMFsimple2)
+
+> # above 
+> summary(trendMFsimple2)
+Error in h(simpleError(msg, call)) : 
+  error in evaluating the argument 'object' in selecting a method for function 'summary': object 'trendMFsimple2' not found
+> # like emmeans but with continuous variables
+> trendMFsimple2<-emtrends(MFrmodel.2, ~simplesex*field_season, var = "conditionC")
+> summary(trendMFsimple2)
+ simplesex field_season conditionC.trend     SE  df lower.CL upper.CL
+ M         spring                -0.0952 0.0563 202   -0.206   0.0158
+ F         spring                -0.0952 0.0563 202   -0.206   0.0158
+ M         summer                -0.5749 0.0831 364   -0.738  -0.4114
+ F         summer                -0.5749 0.0831 364   -0.738  -0.4114
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+> # to get pvalues
+> test(trendMFsimple2)
+ simplesex field_season conditionC.trend     SE  df t.ratio p.value
+ M         spring                -0.0952 0.0563 202  -1.691  0.0924
+ F         spring                -0.0952 0.0563 202  -1.691  0.0924
+ M         summer                -0.5749 0.0831 364  -6.916  <.0001
+ F         summer                -0.5749 0.0831 364  -6.916  <.0001
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+
+trendMFsimple2.pairwise<-emtrends(MFrmodel.2, pairwise~simplesex|field_season, var = "conditionC")
+# above 
+summary(trendMFsimple2.pairwise) # is there a sig effect of condit for each sex and season
+# to get pvalues
+test(trendMFsimple2.pairwise) # is the effect of condition sig diff based on sex
+# females more affected by condition than non-repr; males somewhat compared to non-repr
+
+summary(trendMFsimple2)
+ simplesex field_season conditionC.trend     SE  df lower.CL upper.CL
+ M         spring                -0.0952 0.0563 202   -0.206   0.0158
+ F         spring                -0.0952 0.0563 202   -0.206   0.0158
+ M         summer                -0.5749 0.0831 364   -0.738  -0.4114
+ F         summer                -0.5749 0.0831 364   -0.738  -0.4114
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+> # to get pvalues
+> test(trendMFsimple2)
+ simplesex field_season conditionC.trend     SE  df t.ratio p.value
+ M         spring                -0.0952 0.0563 202  -1.691  0.0924
+ F         spring                -0.0952 0.0563 202  -1.691  0.0924
+ M         summer                -0.5749 0.0831 364  -6.916  <.0001
+ F         summer                -0.5749 0.0831 364  -6.916  <.0001
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+###                                                                                         ERRORS                  ERRORS                     ERRORS
+
+trendMFsimple2.pairwise<-emtrends(MFrmodel.2, pairwise~simplesex|field_season, var = "conditionC")
+# above 
+summary(trendMFsimple2.pairwise) # is there a sig effect of condit for each sex and season
+# to get pvalues
+test(trendMFsimple2.pairwise) # is the effect of condition sig diff based on sex
+# females more affected by condition than non-repr; males somewhat compared to non-repr
+
+> trendMFsimple2.pairwise<-emtrends(MFrmodel.2, pairwise~simplesex|field_season, var = "conditionC")
+> # above 
+> summary(trendMFsimple2.pairwise) # is there a sig effect of condit for each sex and season
+Error in solve.default(L %*% V0 %*% t(L), L) : 
+  Lapack routine dgesv: system is exactly singular: U[1,1] = 0
