@@ -178,6 +178,7 @@ summary(em.3)
 summary(em.4)
 summary(em.5)
 
+##################### most means non-estimable
       $emmeans
 field_season = spring, conditionC = 0:
  detailed_sex emmean SE df asymp.LCL asymp.UCL
@@ -242,4 +243,327 @@ Results are averaged over the levels of: par
 Degrees-of-freedom method: kenward-roger 
 P value adjustment: tukey method for comparing a family of 6 estimates 
 
-                                                              ###### error fixed-effect model matrix is rank deficient so dropping 1 column / coefficient
+                                                              ###### errors on every emm fixed-effect model matrix is rank deficient so dropping 1 column / coefficient
+$emmeans
+field_season = spring, conditionC = 1:
+ detailed_sex emmean SE df asymp.LCL asymp.UCL
+ B            nonEst NA NA        NA        NA
+ BF           nonEst NA NA        NA        NA
+ BM           nonEst NA NA        NA        NA
+ F            nonEst NA NA        NA        NA
+ M            nonEst NA NA        NA        NA
+ N            nonEst NA NA        NA        NA
+
+field_season = summer, conditionC = 1:
+ detailed_sex emmean SE df asymp.LCL asymp.UCL
+ B            nonEst NA NA        NA        NA
+ BF           nonEst NA NA        NA        NA
+ BM           nonEst NA NA        NA        NA
+ F            nonEst NA NA        NA        NA
+ M            nonEst NA NA        NA        NA
+ N            nonEst NA NA        NA        NA
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 1:
+ contrast estimate     SE   df t.ratio p.value
+ B - BF    -1.9050 0.3784 1091  -5.034  <.0001
+ B - BM    -2.4859 0.3772 1394  -6.591  <.0001
+ B - F     -0.9791 0.2993  894  -3.271  0.0141
+ B - M     -1.2370 0.2719  896  -4.549  0.0001
+ B - N     -0.8096 0.2771  884  -2.922  0.0414
+ BF - BM   -0.5809 0.2878 2371  -2.019  0.3319
+ BF - F     0.9259 0.3439  624   2.692  0.0782
+ BF - M     0.6680 0.2824 1262   2.365  0.1694
+ BF - N     1.0954 0.2925 1064   3.745  0.0026
+ BM - F     1.5069 0.3468  814   4.345  0.0002
+ BM - M     1.2489 0.2867 1782   4.357  0.0002
+ BM - N     1.6763 0.2967 1521   5.649  <.0001
+ F - M     -0.2579 0.2189  251  -1.178  0.8470
+ F - N      0.1695 0.2246  251   0.755  0.9746
+ M - N      0.4274 0.0983  700   4.349  0.0002
+
+field_season = summer, conditionC = 1:
+ contrast estimate     SE   df t.ratio p.value
+ B - BF     0.8664 0.4160 2391   2.083  0.2967
+ B - BM    -0.5931 0.5561 2411  -1.066  0.8947
+ B - F      0.0235 0.3449  754   0.068  1.0000
+ B - M     -0.0742 0.2616 1173  -0.284  0.9998
+ B - N     -0.1373 0.2735 1031  -0.502  0.9961
+ BF - BM   -1.4595 0.5459 2277  -2.674  0.0809
+ BF - F    -0.8429 0.4709 1332  -1.790  0.4726
+ BF - M    -0.9406 0.3912 2191  -2.405  0.1549
+ BF - N    -1.0037 0.4038 2112  -2.486  0.1287
+ BM - F     0.6166 0.5797 1934   1.064  0.8958
+ BM - M     0.5189 0.5082 2309   1.021  0.9110
+ BM - N     0.4558 0.5213 2351   0.874  0.9527
+ F - M     -0.0977 0.2927  341  -0.334  0.9994
+ F - N     -0.1608 0.2931  349  -0.549  0.9941
+ M - N     -0.0631 0.1213 1085  -0.520  0.9954
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 6 estimates 
+
+> summary(em.2)
+$emmeans
+field_season = spring, conditionC = 2:
+ detailed_sex emmean SE df asymp.LCL asymp.UCL
+ B            nonEst NA NA        NA        NA
+ BF           nonEst NA NA        NA        NA
+ BM           nonEst NA NA        NA        NA
+ F            nonEst NA NA        NA        NA
+ M            nonEst NA NA        NA        NA
+ N            nonEst NA NA        NA        NA
+
+field_season = summer, conditionC = 2:
+ detailed_sex emmean SE df asymp.LCL asymp.UCL
+ B            nonEst NA NA        NA        NA
+ BF           nonEst NA NA        NA        NA
+ BM           nonEst NA NA        NA        NA
+ F            nonEst NA NA        NA        NA
+ M            nonEst NA NA        NA        NA
+ N            nonEst NA NA        NA        NA
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 2:
+ contrast estimate     SE   df t.ratio p.value
+ B - BF    -1.9050 0.3784 1091  -5.034  <.0001
+ B - BM    -2.4859 0.3772 1394  -6.591  <.0001
+ B - F     -0.9791 0.2993  894  -3.271  0.0141
+ B - M     -1.2370 0.2719  896  -4.549  0.0001
+ B - N     -0.8096 0.2771  884  -2.922  0.0414
+ BF - BM   -0.5809 0.2878 2371  -2.019  0.3319
+ BF - F     0.9259 0.3439  624   2.692  0.0782
+ BF - M     0.6680 0.2824 1262   2.365  0.1694
+ BF - N     1.0954 0.2925 1064   3.745  0.0026
+ BM - F     1.5069 0.3468  814   4.345  0.0002
+ BM - M     1.2489 0.2867 1782   4.357  0.0002
+ BM - N     1.6763 0.2967 1521   5.649  <.0001
+ F - M     -0.2579 0.2189  251  -1.178  0.8470
+ F - N      0.1695 0.2246  251   0.755  0.9746
+ M - N      0.4274 0.0983  700   4.349  0.0002
+
+field_season = summer, conditionC = 2:
+ contrast estimate     SE   df t.ratio p.value
+ B - BF     0.8664 0.4160 2391   2.083  0.2967
+ B - BM    -0.5931 0.5561 2411  -1.066  0.8947
+ B - F      0.0235 0.3449  754   0.068  1.0000
+ B - M     -0.0742 0.2616 1173  -0.284  0.9998
+ B - N     -0.1373 0.2735 1031  -0.502  0.9961
+ BF - BM   -1.4595 0.5459 2277  -2.674  0.0809
+ BF - F    -0.8429 0.4709 1332  -1.790  0.4726
+ BF - M    -0.9406 0.3912 2191  -2.405  0.1549
+ BF - N    -1.0037 0.4038 2112  -2.486  0.1287
+ BM - F     0.6166 0.5797 1934   1.064  0.8958
+ BM - M     0.5189 0.5082 2309   1.021  0.9110
+ BM - N     0.4558 0.5213 2351   0.874  0.9527
+ F - M     -0.0977 0.2927  341  -0.334  0.9994
+ F - N     -0.1608 0.2931  349  -0.549  0.9941
+ M - N     -0.0631 0.1213 1085  -0.520  0.9954
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 6 estimates 
+
+> summary(em.3)
+$emmeans
+field_season = spring, conditionC = 3:
+ detailed_sex emmean SE df asymp.LCL asymp.UCL
+ B            nonEst NA NA        NA        NA
+ BF           nonEst NA NA        NA        NA
+ BM           nonEst NA NA        NA        NA
+ F            nonEst NA NA        NA        NA
+ M            nonEst NA NA        NA        NA
+ N            nonEst NA NA        NA        NA
+
+field_season = summer, conditionC = 3:
+ detailed_sex emmean SE df asymp.LCL asymp.UCL
+ B            nonEst NA NA        NA        NA
+ BF           nonEst NA NA        NA        NA
+ BM           nonEst NA NA        NA        NA
+ F            nonEst NA NA        NA        NA
+ M            nonEst NA NA        NA        NA
+ N            nonEst NA NA        NA        NA
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 3:
+ contrast estimate     SE   df t.ratio p.value
+ B - BF    -1.9050 0.3784 1091  -5.034  <.0001
+ B - BM    -2.4859 0.3772 1394  -6.591  <.0001
+ B - F     -0.9791 0.2993  894  -3.271  0.0141
+ B - M     -1.2370 0.2719  896  -4.549  0.0001
+ B - N     -0.8096 0.2771  884  -2.922  0.0414
+ BF - BM   -0.5809 0.2878 2371  -2.019  0.3319
+ BF - F     0.9259 0.3439  624   2.692  0.0782
+ BF - M     0.6680 0.2824 1262   2.365  0.1694
+ BF - N     1.0954 0.2925 1064   3.745  0.0026
+ BM - F     1.5069 0.3468  814   4.345  0.0002
+ BM - M     1.2489 0.2867 1782   4.357  0.0002
+ BM - N     1.6763 0.2967 1521   5.649  <.0001
+ F - M     -0.2579 0.2189  251  -1.178  0.8470
+ F - N      0.1695 0.2246  251   0.755  0.9746
+ M - N      0.4274 0.0983  700   4.349  0.0002
+
+field_season = summer, conditionC = 3:
+ contrast estimate     SE   df t.ratio p.value
+ B - BF     0.8664 0.4160 2391   2.083  0.2967
+ B - BM    -0.5931 0.5561 2411  -1.066  0.8947
+ B - F      0.0235 0.3449  754   0.068  1.0000
+ B - M     -0.0742 0.2616 1173  -0.284  0.9998
+ B - N     -0.1373 0.2735 1031  -0.502  0.9961
+ BF - BM   -1.4595 0.5459 2277  -2.674  0.0809
+ BF - F    -0.8429 0.4709 1332  -1.790  0.4726
+ BF - M    -0.9406 0.3912 2191  -2.405  0.1549
+ BF - N    -1.0037 0.4038 2112  -2.486  0.1287
+ BM - F     0.6166 0.5797 1934   1.064  0.8958
+ BM - M     0.5189 0.5082 2309   1.021  0.9110
+ BM - N     0.4558 0.5213 2351   0.874  0.9527
+ F - M     -0.0977 0.2927  341  -0.334  0.9994
+ F - N     -0.1608 0.2931  349  -0.549  0.9941
+ M - N     -0.0631 0.1213 1085  -0.520  0.9954
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 6 estimates 
+
+> summary(em.4)
+$emmeans
+field_season = spring, conditionC = 4:
+ detailed_sex emmean SE df asymp.LCL asymp.UCL
+ B            nonEst NA NA        NA        NA
+ BF           nonEst NA NA        NA        NA
+ BM           nonEst NA NA        NA        NA
+ F            nonEst NA NA        NA        NA
+ M            nonEst NA NA        NA        NA
+ N            nonEst NA NA        NA        NA
+
+field_season = summer, conditionC = 4:
+ detailed_sex emmean SE df asymp.LCL asymp.UCL
+ B            nonEst NA NA        NA        NA
+ BF           nonEst NA NA        NA        NA
+ BM           nonEst NA NA        NA        NA
+ F            nonEst NA NA        NA        NA
+ M            nonEst NA NA        NA        NA
+ N            nonEst NA NA        NA        NA
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 4:
+ contrast estimate     SE   df t.ratio p.value
+ B - BF    -1.9050 0.3784 1091  -5.034  <.0001
+ B - BM    -2.4859 0.3772 1394  -6.591  <.0001
+ B - F     -0.9791 0.2993  894  -3.271  0.0141
+ B - M     -1.2370 0.2719  896  -4.549  0.0001
+ B - N     -0.8096 0.2771  884  -2.922  0.0414
+ BF - BM   -0.5809 0.2878 2371  -2.019  0.3319
+ BF - F     0.9259 0.3439  624   2.692  0.0782
+ BF - M     0.6680 0.2824 1262   2.365  0.1694
+ BF - N     1.0954 0.2925 1064   3.745  0.0026
+ BM - F     1.5069 0.3468  814   4.345  0.0002
+ BM - M     1.2489 0.2867 1782   4.357  0.0002
+ BM - N     1.6763 0.2967 1521   5.649  <.0001
+ F - M     -0.2579 0.2189  251  -1.178  0.8470
+ F - N      0.1695 0.2246  251   0.755  0.9746
+ M - N      0.4274 0.0983  700   4.349  0.0002
+
+field_season = summer, conditionC = 4:
+ contrast estimate     SE   df t.ratio p.value
+ B - BF     0.8664 0.4160 2391   2.083  0.2967
+ B - BM    -0.5931 0.5561 2411  -1.066  0.8947
+ B - F      0.0235 0.3449  754   0.068  1.0000
+ B - M     -0.0742 0.2616 1173  -0.284  0.9998
+ B - N     -0.1373 0.2735 1031  -0.502  0.9961
+ BF - BM   -1.4595 0.5459 2277  -2.674  0.0809
+ BF - F    -0.8429 0.4709 1332  -1.790  0.4726
+ BF - M    -0.9406 0.3912 2191  -2.405  0.1549
+ BF - N    -1.0037 0.4038 2112  -2.486  0.1287
+ BM - F     0.6166 0.5797 1934   1.064  0.8958
+ BM - M     0.5189 0.5082 2309   1.021  0.9110
+ BM - N     0.4558 0.5213 2351   0.874  0.9527
+ F - M     -0.0977 0.2927  341  -0.334  0.9994
+ F - N     -0.1608 0.2931  349  -0.549  0.9941
+ M - N     -0.0631 0.1213 1085  -0.520  0.9954
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 6 estimates 
+
+> summary(em.5)
+$emmeans
+field_season = spring, conditionC = 5:
+ detailed_sex emmean SE df asymp.LCL asymp.UCL
+ B            nonEst NA NA        NA        NA
+ BF           nonEst NA NA        NA        NA
+ BM           nonEst NA NA        NA        NA
+ F            nonEst NA NA        NA        NA
+ M            nonEst NA NA        NA        NA
+ N            nonEst NA NA        NA        NA
+
+field_season = summer, conditionC = 5:
+ detailed_sex emmean SE df asymp.LCL asymp.UCL
+ B            nonEst NA NA        NA        NA
+ BF           nonEst NA NA        NA        NA
+ BM           nonEst NA NA        NA        NA
+ F            nonEst NA NA        NA        NA
+ M            nonEst NA NA        NA        NA
+ N            nonEst NA NA        NA        NA
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 5:
+ contrast estimate     SE   df t.ratio p.value
+ B - BF    -1.9050 0.3784 1091  -5.034  <.0001
+ B - BM    -2.4859 0.3772 1394  -6.591  <.0001
+ B - F     -0.9791 0.2993  894  -3.271  0.0141
+ B - M     -1.2370 0.2719  896  -4.549  0.0001
+ B - N     -0.8096 0.2771  884  -2.922  0.0414
+ BF - BM   -0.5809 0.2878 2371  -2.019  0.3319
+ BF - F     0.9259 0.3439  624   2.692  0.0782
+ BF - M     0.6680 0.2824 1262   2.365  0.1694
+ BF - N     1.0954 0.2925 1064   3.745  0.0026
+ BM - F     1.5069 0.3468  814   4.345  0.0002
+ BM - M     1.2489 0.2867 1782   4.357  0.0002
+ BM - N     1.6763 0.2967 1521   5.649  <.0001
+ F - M     -0.2579 0.2189  251  -1.178  0.8470
+ F - N      0.1695 0.2246  251   0.755  0.9746
+ M - N      0.4274 0.0983  700   4.349  0.0002
+
+field_season = summer, conditionC = 5:
+ contrast estimate     SE   df t.ratio p.value
+ B - BF     0.8664 0.4160 2391   2.083  0.2967
+ B - BM    -0.5931 0.5561 2411  -1.066  0.8947
+ B - F      0.0235 0.3449  754   0.068  1.0000
+ B - M     -0.0742 0.2616 1173  -0.284  0.9998
+ B - N     -0.1373 0.2735 1031  -0.502  0.9961
+ BF - BM   -1.4595 0.5459 2277  -2.674  0.0809
+ BF - F    -0.8429 0.4709 1332  -1.790  0.4726
+ BF - M    -0.9406 0.3912 2191  -2.405  0.1549
+ BF - N    -1.0037 0.4038 2112  -2.486  0.1287
+ BM - F     0.6166 0.5797 1934   1.064  0.8958
+ BM - M     0.5189 0.5082 2309   1.021  0.9110
+ BM - N     0.4558 0.5213 2351   0.874  0.9527
+ F - M     -0.0977 0.2927  341  -0.334  0.9994
+ F - N     -0.1608 0.2931  349  -0.549  0.9941
+ M - N     -0.0631 0.1213 1085  -0.520  0.9954
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 6 estimates 
