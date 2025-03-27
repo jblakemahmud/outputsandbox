@@ -1,0 +1,245 @@
+#############################################################################################################################
+###
+###                                model with all the sexes
+###
+#############################################################################################################################
+# model <-lmer(photo ~ detailed_sex+par+field_season+conditionC+time_clean+VpdL+Tleaf+combined_caliper+ RH_S +
+# 2 way detailed_sex:field_season +  detailed_sex:conditionC + detailed_sex:field_season + detailed_sex:combined_caliper+ #3way detailed_sex:field_season:condition+
+model <-lmer(photo ~ detailed_sex+par+field_season+conditionC+time_clean+VpdL+Tleaf+
+                         # 2 way
+                         detailed_sex:field_season +  detailed_sex:field_season + 
+                         #3way 
+                         detailed_sex:field_season:condition+
+                         #random effects
+                           (1|transect)+(1+ field_season+VpdL|tree_code)+ (1|year),
+                         REML = FALSE,data=dat2, na.action = na.omit, lmerControl(optimizer = "bobyqa" ))
+#still rank deficient
+AIC(model)   #7060
+BIC(model)   #6798 full. #6770 without se:caliper #6798 withut 3way  #6793 without caliper; no RH
+#6766 with no sex:caliper, no plain caliper, no sex:condition interaction
+anova(model)
+
+      Type III Analysis of Variance Table with Satterthwaite's method
+                                    Sum Sq Mean Sq NumDF   DenDF  F value    Pr(>F)    
+detailed_sex                         20.51   4.101     5  755.90   7.5181 6.697e-07 ***
+par                                 520.18 173.393     3 2092.90 317.8531 < 2.2e-16 ***
+field_season                          4.27   4.267     1  955.40   7.8228  0.005263 ** 
+conditionC                            8.11   8.111     1  763.30  14.8684  0.000125 ***
+time_clean                            0.19   0.188     1 2286.42   0.3451  0.556974    
+VpdL                                 37.94  37.942     1  169.98  69.5528 2.443e-14 ***
+Tleaf                               269.23 269.231     1 2354.05 493.5357 < 2.2e-16 ***
+detailed_sex:field_season            18.68   3.737     5  886.95   6.8503 2.778e-06 ***
+detailed_sex:field_season:condition  60.07   5.461    11 1010.26  10.0112 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+      
+summary(model)
+
+      Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: photo ~ detailed_sex + par + field_season + conditionC + time_clean +  
+    VpdL + Tleaf + detailed_sex:field_season + detailed_sex:field_season +  
+    detailed_sex:field_season:condition + (1 | transect) + (1 +      field_season + VpdL | tree_code) + (1 | year)
+   Data: dat2
+Control: lmerControl(optimizer = "bobyqa")
+
+     AIC      BIC   logLik deviance df.resid 
+  6539.0   6766.5  -3230.5   6461.0     2485 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-4.0022 -0.5740  0.0086  0.5793  3.3474 
+
+Random effects:
+ Groups    Name               Variance Std.Dev. Corr       
+ tree_code (Intercept)        1.36825  1.1697              
+           field_seasonsummer 1.36788  1.1696   -0.31      
+           VpdL               2.97312  1.7243   -0.87 -0.02
+ transect  (Intercept)        0.51353  0.7166              
+ year      (Intercept)        0.01095  0.1047              
+ Residual                     0.54551  0.7386              
+Number of obs: 2524, groups:  tree_code, 135; transect, 14; year, 3
+
+Fixed effects:
+                                              Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                                 -2.144e+00  5.812e-01  4.213e+02  -3.689 0.000255 ***
+detailed_sexBF                               3.742e+00  7.293e-01  9.438e+02   5.131 3.50e-07 ***
+detailed_sexBM                               5.262e+00  7.257e-01  1.288e+03   7.251 7.13e-13 ***
+detailed_sexF                                2.637e+00  5.796e-01  5.983e+02   4.549 6.52e-06 ***
+detailed_sexM                                2.359e+00  5.062e-01  6.406e+02   4.660 3.85e-06 ***
+detailed_sexN                                1.762e+00  5.076e-01  6.144e+02   3.471 0.000555 ***
+par500                                       8.324e-01  4.172e-02  2.050e+03  19.949  < 2e-16 ***
+par1000                                      1.104e+00  4.268e-02  2.098e+03  25.856  < 2e-16 ***
+par1500                                      1.248e+00  4.475e-02  2.178e+03  27.887  < 2e-16 ***
+field_seasonsummer                           1.888e+00  6.812e-01  1.334e+03   2.772 0.005652 ** 
+conditionC                                  -3.011e-01  7.808e-02  7.633e+02  -3.856 0.000125 ***
+time_clean                                   2.320e-01  3.949e-01  2.286e+03   0.587 0.556974    
+VpdL                                        -1.741e+00  2.088e-01  1.700e+02  -8.340 2.44e-14 ***
+Tleaf                                        2.142e-01  9.643e-03  2.354e+03  22.216  < 2e-16 ***
+detailed_sexBF:field_seasonsummer           -4.941e+00  1.090e+00  2.020e+03  -4.532 6.18e-06 ***
+detailed_sexBM:field_seasonsummer           -4.542e+00  1.223e+00  2.348e+03  -3.713 0.000210 ***
+detailed_sexF:field_seasonsummer            -3.346e+00  8.853e-01  9.291e+02  -3.780 0.000167 ***
+detailed_sexM:field_seasonsummer            -2.518e+00  6.974e-01  1.342e+03  -3.610 0.000317 ***
+detailed_sexN:field_seasonsummer            -2.065e+00  6.995e-01  1.320e+03  -2.953 0.003204 ** 
+detailed_sexB:field_seasonspring:condition   1.036e+00  1.723e-01  1.005e+03   6.015 2.51e-09 ***
+detailed_sexBF:field_seasonspring:condition -4.228e-03  1.989e-01  1.803e+03  -0.021 0.983041    
+detailed_sexBM:field_seasonspring:condition -5.362e-01  1.914e-01  2.218e+03  -2.802 0.005126 ** 
+detailed_sexF:field_seasonspring:condition   9.725e-02  1.518e-01  3.875e+02   0.641 0.522121    
+detailed_sexM:field_seasonspring:condition   4.009e-01  9.645e-02  7.717e+02   4.157 3.59e-05 ***
+detailed_sexN:field_seasonspring:condition   4.968e-01  1.007e-01  6.913e+02   4.934 1.01e-06 ***
+detailed_sexB:field_seasonsummer:condition  -2.497e-01  1.610e-01  1.700e+03  -1.551 0.121184    
+detailed_sexBF:field_seasonsummer:condition -6.106e-02  2.582e-01  1.807e+03  -0.237 0.813047    
+detailed_sexBM:field_seasonsummer:condition -3.213e-01  2.879e-01  2.211e+03  -1.116 0.264446    
+detailed_sexF:field_seasonsummer:condition   1.390e-01  1.810e-01  3.995e+02   0.768 0.442902    
+detailed_sexM:field_seasonsummer:condition  -1.175e-01  8.818e-02  1.196e+03  -1.333 0.182875    
+
+# comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
+em<- emmeans(model, pairwise~detailed_sex|field_season*conditionC)  
+# above averages over all condition types
+summary(em)
+                                                        ###### error fixed-effect model matrix is rank deficient so dropping 1 column / coefficient
+
+$emmeans
+field_season = spring, conditionC = 1.77:
+ detailed_sex emmean    SE    df lower.CL upper.CL
+ B              2.80 0.345  99.6    2.117     3.49
+ BF             4.71 0.346  91.5    4.020     5.40
+ BM             5.29 0.354 108.3    4.587     5.99
+ F              3.78 0.303  55.4    3.175     4.39
+ M              4.04 0.230  19.2    3.559     4.52
+ N              3.61 0.234  20.9    3.124     4.10
+
+field_season = summer, conditionC = 1.77:
+ detailed_sex emmean    SE    df lower.CL upper.CL
+ B              2.42 0.331  83.6    1.762     3.08
+ BF             1.55 0.453 286.5    0.662     2.45
+ BM             3.01 0.562 612.2    1.911     4.12
+ F              2.40 0.354  98.4    1.695     3.10
+ M              2.49 0.242  23.7    1.996     2.99
+ N              2.56 0.246  25.7    2.052     3.06
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 1.77:
+ contrast estimate     SE   df t.ratio p.value
+ B - BF    -1.9050 0.3784 1091  -5.034  <.0001
+ B - BM    -2.4859 0.3772 1394  -6.591  <.0001
+ B - F     -0.9791 0.2993  894  -3.271  0.0141
+ B - M     -1.2370 0.2719  896  -4.549  0.0001
+ B - N     -0.8096 0.2771  884  -2.922  0.0414
+ BF - BM   -0.5809 0.2878 2371  -2.019  0.3319
+ BF - F     0.9259 0.3439  624   2.692  0.0782
+ BF - M     0.6680 0.2824 1262   2.365  0.1694
+ BF - N     1.0954 0.2925 1064   3.745  0.0026
+ BM - F     1.5069 0.3468  814   4.345  0.0002
+ BM - M     1.2489 0.2867 1782   4.357  0.0002
+ BM - N     1.6763 0.2967 1521   5.649  <.0001
+ F - M     -0.2579 0.2189  251  -1.178  0.8470
+ F - N      0.1695 0.2246  251   0.755  0.9746
+ M - N      0.4274 0.0983  700   4.349  0.0002
+
+field_season = summer, conditionC = 1.77:
+ contrast estimate     SE   df t.ratio p.value
+ B - BF     0.8664 0.4160 2391   2.083  0.2967
+ B - BM    -0.5931 0.5561 2411  -1.066  0.8947
+ B - F      0.0235 0.3449  754   0.068  1.0000
+ B - M     -0.0742 0.2616 1173  -0.284  0.9998
+ B - N     -0.1373 0.2735 1031  -0.502  0.9961
+ BF - BM   -1.4595 0.5459 2277  -2.674  0.0809
+ BF - F    -0.8429 0.4709 1332  -1.790  0.4726
+ BF - M    -0.9406 0.3912 2191  -2.405  0.1549
+ BF - N    -1.0037 0.4038 2112  -2.486  0.1287
+ BM - F     0.6166 0.5797 1934   1.064  0.8958
+ BM - M     0.5189 0.5082 2309   1.021  0.9110
+ BM - N     0.4558 0.5213 2351   0.874  0.9527
+ F - M     -0.0977 0.2927  341  -0.334  0.9994
+ F - N     -0.1608 0.2931  349  -0.549  0.9941
+ M - N     -0.0631 0.1213 1085  -0.520  0.9954
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 6 estimates 
+      
+# all these comparisons will be the same, since condition is no involved in an interaction with sex 
+# comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
+em.0<- emmeans(model, pairwise~detailed_sex|field_season*conditionC, at= list(conditionC = 0)) 
+em.1<- emmeans(model, pairwise~detailed_sex|field_season*conditionC, at= list(conditionC = 1)) 
+em.2<- emmeans(model, pairwise~detailed_sex|field_season*conditionC, at= list(conditionC = 2)) 
+em.3<- emmeans(model, pairwise~detailed_sex|field_season*conditionC, at= list(conditionC = 3)) 
+em.4<- emmeans(model, pairwise~detailed_sex|field_season*conditionC, at= list(conditionC = 4)) 
+em.5<- emmeans(model, pairwise~detailed_sex|field_season*conditionC, at= list(conditionC = 5)) 
+# above looks at one level of condition
+summary(em.0)
+summary(em.1)
+summary(em.2)
+summary(em.3)
+summary(em.4)
+summary(em.5)
+
+      $emmeans
+field_season = spring, conditionC = 0:
+ detailed_sex emmean SE df asymp.LCL asymp.UCL
+ B            nonEst NA NA        NA        NA
+ BF           nonEst NA NA        NA        NA
+ BM           nonEst NA NA        NA        NA
+ F            nonEst NA NA        NA        NA
+ M            nonEst NA NA        NA        NA
+ N            nonEst NA NA        NA        NA
+
+field_season = summer, conditionC = 0:
+ detailed_sex emmean SE df asymp.LCL asymp.UCL
+ B            nonEst NA NA        NA        NA
+ BF           nonEst NA NA        NA        NA
+ BM           nonEst NA NA        NA        NA
+ F            nonEst NA NA        NA        NA
+ M            nonEst NA NA        NA        NA
+ N            nonEst NA NA        NA        NA
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 0:
+ contrast estimate     SE   df t.ratio p.value
+ B - BF    -1.9050 0.3784 1091  -5.034  <.0001
+ B - BM    -2.4859 0.3772 1394  -6.591  <.0001
+ B - F     -0.9791 0.2993  894  -3.271  0.0141
+ B - M     -1.2370 0.2719  896  -4.549  0.0001
+ B - N     -0.8096 0.2771  884  -2.922  0.0414
+ BF - BM   -0.5809 0.2878 2371  -2.019  0.3319
+ BF - F     0.9259 0.3439  624   2.692  0.0782
+ BF - M     0.6680 0.2824 1262   2.365  0.1694
+ BF - N     1.0954 0.2925 1064   3.745  0.0026
+ BM - F     1.5069 0.3468  814   4.345  0.0002
+ BM - M     1.2489 0.2867 1782   4.357  0.0002
+ BM - N     1.6763 0.2967 1521   5.649  <.0001
+ F - M     -0.2579 0.2189  251  -1.178  0.8470
+ F - N      0.1695 0.2246  251   0.755  0.9746
+ M - N      0.4274 0.0983  700   4.349  0.0002
+
+field_season = summer, conditionC = 0:
+ contrast estimate     SE   df t.ratio p.value
+ B - BF     0.8664 0.4160 2391   2.083  0.2967
+ B - BM    -0.5931 0.5561 2411  -1.066  0.8947
+ B - F      0.0235 0.3449  754   0.068  1.0000
+ B - M     -0.0742 0.2616 1173  -0.284  0.9998
+ B - N     -0.1373 0.2735 1031  -0.502  0.9961
+ BF - BM   -1.4595 0.5459 2277  -2.674  0.0809
+ BF - F    -0.8429 0.4709 1332  -1.790  0.4726
+ BF - M    -0.9406 0.3912 2191  -2.405  0.1549
+ BF - N    -1.0037 0.4038 2112  -2.486  0.1287
+ BM - F     0.6166 0.5797 1934   1.064  0.8958
+ BM - M     0.5189 0.5082 2309   1.021  0.9110
+ BM - N     0.4558 0.5213 2351   0.874  0.9527
+ F - M     -0.0977 0.2927  341  -0.334  0.9994
+ F - N     -0.1608 0.2931  349  -0.549  0.9941
+ M - N     -0.0631 0.1213 1085  -0.520  0.9954
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 6 estimates 
+
+                                                              ###### error fixed-effect model matrix is rank deficient so dropping 1 column / coefficient
