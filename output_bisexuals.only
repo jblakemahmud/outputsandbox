@@ -1,0 +1,514 @@
+# Mar 26, 2025
+# what is going on with these bisexuals?
+# comparing bisexuals BM and BF
+
+# pulls out the data we want to look at
+# reproductive trees only
+Bdat <- filter(dat2,detailed_sex == 'B' | detailed_sex == 'F' | detailed_sex == 'BF'| detailed_sex == 'BM'| detailed_sex == 'M')
+table(Bdat$keep)
+str(Bdat)
+
+# bisexual trees only
+Bdatonly <- filter(dat2,detailed_sex == 'B' | detailed_sex == 'BF'| detailed_sex == 'BM')
+table(Bdatonly$keep)
+summary(Bdatonly$tree_code) # only 26 trees with records
+str(Bdatonly)
+
+#any variables need changing?
+#Bdat$photo <- as.numeric(Bdat$photo)
+Bdatonly$conditionC <- as.numeric(Bdatonly$condition)
+
+summary(Bdatonly$detailed_sex)
+levels(Bdatonly$detailed_sex)
+summary(Bdatonly$sex)
+
+
+#need forcats package for this
+#Recoding sex columns
+#monodat$sex <- fct_recode(monodat$detailed_sex, B = "BF", B = "BM")  # all bisexuals become B
+#monodat$simplesex <- fct_recode(monodat$detailed_sex, F = "B", F = "BF", F = "BM")  # all bisexuals become F
+#monodat$splitsex <- fct_recode(monodat$detailed_sex, F = "BF", M = "BM")  # some bisexuals become  M or F # problematic column becuase the BM and BF have already been averaged
+set levels
+Bdatonly$detailed_sex <- factor(Bdat$detailed_sex, levels = c( "BM", "B", "BF"))
+
+bisexualish = lm(photo~detailed_sex+par+field_season, data = Bdat) #Create the linear regression
+summary(bisexualish) #Review the results
+anova(bisexualish)
+
+# M is different from B, BF, BM, F
+# B is different from M, but not from BF, BM, F
+# F is different from BM, M
+
+bisexualishLMM<-lmer(photo ~ detailed_sex+par+field_season+combined_caliper+condition+time_clean+
+                       # 2 way
+                       #detailed_sex:field_season + detailed_sex:condition+
+                       #random effects
+                       (1|transect) + (1|tree_code)+ (1|year), 
+                     data=Bdat, na.action = na.omit)
+summary(bisexualishLMM)
+anova(bisexualishLMM)
+
+#bisexual is different from M but not BF or F. at .06 for BM
+#male is different from B, but no one else
+#female is different from B, but no one else
+
+######fit random effects
+bisexualishLMM<-lmer(photo ~ detailed_sex+par+field_season+combined_caliper+conditionC+time_clean+
+                       # 2 way
+                       detailed_sex:field_season + detailed_sex:conditionC+ conditionC:field_season +
+                       # 3 way
+                       detailed_sex:field_season:conditionC+
+                       #random effects
+                       (1|transect) + (1+ field_season+VpdL|tree_code) + (1|year), 
+                        data=Bdatonly, na.action = na.omit )
+
+BIC (bisexualishLMM)
+# remove
+#      BIC 837
+#   (1|transect) +   BIC 836
+#   + (1|year)       BIC 856
+#  field_season+     BIC 942
+# +VpdL              BIC 908
+# best random effects structure is full, proceed
+
+################################################ fit fixed effects 
+
+bisexualishLMM<-lmer(photo ~ detailed_sex+par+field_season+conditionC+time_clean+ 
+                       # 2 way
+                       detailed_sex:field_season + detailed_sex:conditionC+ conditionC:field_season +
+                       # 3 way
+                       detailed_sex:field_season:conditionC+
+                       #random effects
+                       (1|transect) + (1+ field_season+VpdL|tree_code)+ (1|year), 
+                       REML= FALSE, data=Bdatonly, na.action = na.omit,  lmerControl(optimizer = "bobyqa" ))
+BIC(bisexualishLMM)  #BIC 811
+anova(bisexualishLMM)
+
+#BIC 811
+#remove caliper combined_caliper+ BIC 807
+
+> BIC(bisexualishLMM)  #BIC 811
+[1] 807.2477
+> anova(bisexualishLMM)
+Type III Analysis of Variance Table with Satterthwaite's method
+                                     Sum Sq Mean Sq NumDF  DenDF  F value    Pr(>F)    
+detailed_sex                         15.158  7.5792     2 229.93  29.8008 3.104e-12 ***
+par                                  79.144 26.3815     3 234.91 103.7304 < 2.2e-16 ***
+field_season                          3.443  3.4432     1 113.41  13.5383 0.0003592 ***
+conditionC                           13.001 13.0007     1 186.40  51.1179 1.916e-11 ***
+time_clean                            7.549  7.5495     1 279.89  29.6842 1.115e-07 ***
+detailed_sex:field_season             2.227  1.1136     2 216.42   4.3786 0.0136735 *  
+detailed_sex:conditionC              16.196  8.0981     2 221.77  31.8412 6.976e-13 ***
+field_season:conditionC               8.681  8.6809     1 172.69  34.1329 2.504e-08 ***
+detailed_sex:field_season:conditionC  4.069  2.0343     2 227.54   7.9989 0.0004393 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> summary(bisexualishLMM)
+Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: photo ~ detailed_sex + par + field_season + conditionC + time_clean +  
+    detailed_sex:field_season + detailed_sex:conditionC + conditionC:field_season +  
+    detailed_sex:field_season:conditionC + (1 | transect) + (1 +      field_season + VpdL | tree_code) + (1 | year)
+   Data: Bdatonly
+Control: lmerControl(optimizer = "bobyqa")
+
+     AIC      BIC   logLik deviance df.resid 
+   714.2    807.2   -332.1    664.2      280 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-4.1410 -0.4949  0.0036  0.5826  2.3579 
+
+Random effects:
+ Groups    Name               Variance Std.Dev. Corr       
+ tree_code (Intercept)        3.5607   1.8870              
+           field_seasonsummer 4.1658   2.0410    0.15      
+           VpdL               8.0491   2.8371   -0.85 -0.52
+ transect  (Intercept)        0.6650   0.8155              
+ year      (Intercept)        0.3299   0.5744              
+ Residual                     0.2543   0.5043              
+Number of obs: 305, groups:  tree_code, 25; transect, 9; year, 3
+
+Fixed effects:
+                                              Estimate Std. Error        df t value Pr(>|t|)    
+(Intercept)                                   -5.53927    1.15752  98.44456  -4.785 6.00e-06 ***
+detailed_sexBF                                 5.63014    0.87212 108.23688   6.456 3.14e-09 ***
+detailed_sexBM                                 8.18774    0.85564 114.13777   9.569 2.78e-16 ***
+par500                                         0.92075    0.08273 214.12268  11.130  < 2e-16 ***
+par1000                                        1.28991    0.08719 245.74630  14.795  < 2e-16 ***
+par1500                                        1.58749    0.09730 255.22173  16.315  < 2e-16 ***
+field_seasonsummer                             5.56819    0.92125  97.70084   6.044 2.74e-08 ***
+conditionC                                     1.13717    0.21216  90.24784   5.360 6.33e-07 ***
+time_clean                                     8.62314    1.58271 279.89321   5.448 1.11e-07 ***
+detailed_sexBF:field_seasonsummer             -2.02973    1.30958 202.00309  -1.550  0.12273    
+detailed_sexBM:field_seasonsummer             -3.92649    1.42465 245.39245  -2.756  0.00629 ** 
+detailed_sexBF:conditionC                     -1.53547    0.24750 155.77822  -6.204 4.75e-09 ***
+detailed_sexBM:conditionC                     -2.47616    0.24229 157.44104 -10.220  < 2e-16 ***
+field_seasonsummer:conditionC                 -2.13917    0.24643 148.59548  -8.681 6.47e-15 ***
+detailed_sexBF:field_seasonsummer:conditionC   0.28787    0.35858 235.99801   0.803  0.42290    
+detailed_sexBM:field_seasonsummer:conditionC   1.20825    0.37788 263.69511   3.197  0.00156 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation matrix not shown by default, as p = 16 > 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it
+
+> summary(emm.bisexualish)
+$emmeans
+field_season = spring, conditionC = 2.96:
+ detailed_sex emmean    SE   df lower.CL upper.CL
+ B              2.89 0.592 11.6     1.60     4.19
+ BF             3.97 0.572 10.2     2.70     5.24
+ BM             3.74 0.570 10.1     2.47     5.01
+
+field_season = summer, conditionC = 2.96:
+ detailed_sex emmean    SE   df lower.CL upper.CL
+ B              2.12 0.598 12.2     0.82     3.42
+ BF             2.02 0.629 14.7     0.68     3.36
+ BM             2.62 0.646 16.9     1.26     3.99
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 2.96:
+ contrast estimate    SE  df t.ratio p.value
+ B - BF    -1.0791 0.298 109  -3.617  0.0013
+ B - BM    -0.8486 0.279 114  -3.045  0.0081
+ BF - BM    0.2305 0.121 274   1.912  0.1372
+
+field_season = summer, conditionC = 2.96:
+ contrast estimate    SE  df t.ratio p.value
+ B - BF     0.0974 0.292 292   0.334  0.9405
+ B - BM    -0.5033 0.328 286  -1.535  0.2759
+ BF - BM   -0.6006 0.229 267  -2.618  0.0253
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 3 estimates 
+
+
+# all these comparisons will be the same, since condition is no involved in an interaction with sex 
+# comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
+emm.bisexualish.0<- emmeans(bisexualishLMM, pairwise~detailed_sex|field_season*conditionC, at= list(conditionC = 0)) 
+emm.bisexualish.1<- emmeans(bisexualishLMM, pairwise~detailed_sex|field_season*conditionC, at= list(conditionC = 1)) 
+emm.bisexualish.2<- emmeans(bisexualishLMM, pairwise~detailed_sex|field_season*conditionC, at= list(conditionC = 2)) 
+emm.bisexualish.3<- emmeans(bisexualishLMM, pairwise~detailed_sex|field_season*conditionC, at= list(conditionC = 3)) 
+emm.bisexualish.4<- emmeans(bisexualishLMM, pairwise~detailed_sex|field_season*conditionC, at= list(conditionC = 4)) 
+emm.bisexualish.5<- emmeans(bisexualishLMM, pairwise~detailed_sex|field_season*conditionC, at= list(conditionC = 5)) 
+# above looks at one level of condition
+summary(emm.bisexualish.0)
+summary(emm.bisexualish.1)
+summary(emm.bisexualish.2)
+summary(emm.bisexualish.3)
+summary(emm.bisexualish.4)
+summary(emm.bisexualish.5)
+
+$emmeans
+field_season = spring, conditionC = 0:
+ detailed_sex emmean    SE    df lower.CL upper.CL
+ B            -0.479 0.965  50.3    -2.42     1.46
+ BF            5.151 0.787  37.0     3.56     6.75
+ BM            7.709 0.772  34.9     6.14     9.28
+
+field_season = summer, conditionC = 0:
+ detailed_sex emmean    SE    df lower.CL upper.CL
+ B             5.089 0.798  34.5     3.47     6.71
+ BF            8.690 1.336 128.1     6.05    11.33
+ BM            9.351 1.476 161.3     6.44    12.26
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 0:
+ contrast estimate    SE  df t.ratio p.value
+ B - BF     -5.630 0.965 114  -5.833  <.0001
+ B - BM     -8.188 0.944 121  -8.673  <.0001
+ BF - BM    -2.558 0.489 282  -5.234  <.0001
+
+field_season = summer, conditionC = 0:
+ contrast estimate    SE  df t.ratio p.value
+ B - BF     -3.600 1.209 248  -2.977  0.0089
+ B - BM     -4.261 1.383 271  -3.082  0.0064
+ BF - BM    -0.661 0.784 265  -0.843  0.6764
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 3 estimates 
+
+> summary(emm.bisexualish.1)
+$emmeans
+field_season = spring, conditionC = 1:
+ detailed_sex emmean    SE    df lower.CL upper.CL
+ B             0.658 0.790  31.0   -0.952     2.27
+ BF            4.753 0.669  19.6    3.355     6.15
+ BM            6.370 0.665  19.4    4.980     7.76
+
+field_season = summer, conditionC = 1:
+ detailed_sex emmean    SE    df lower.CL upper.CL
+ B             4.087 0.687  20.8    2.658     5.52
+ BF            6.440 1.022  72.9    4.402     8.48
+ BM            7.081 1.128 100.9    4.843     9.32
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 1:
+ contrast estimate    SE  df t.ratio p.value
+ B - BF     -4.095 0.708 102  -5.783  <.0001
+ B - BM     -5.712 0.691 110  -8.271  <.0001
+ BF - BM    -1.617 0.336 283  -4.807  <.0001
+
+field_season = summer, conditionC = 1:
+ contrast estimate    SE  df t.ratio p.value
+ B - BF     -2.353 0.868 253  -2.711  0.0196
+ B - BM     -2.993 1.003 273  -2.983  0.0087
+ BF - BM    -0.641 0.571 265  -1.122  0.5014
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 3 estimates 
+
+> summary(emm.bisexualish.2)
+$emmeans
+field_season = spring, conditionC = 2:
+ detailed_sex emmean    SE   df lower.CL upper.CL
+ B              1.80 0.656 17.0    0.412     3.18
+ BF             4.35 0.592 11.8    3.062     5.65
+ BM             5.03 0.594 12.0    3.738     6.32
+
+field_season = summer, conditionC = 2:
+ detailed_sex emmean    SE   df lower.CL upper.CL
+ B              3.09 0.616 13.9    1.764     4.41
+ BF             4.19 0.762 29.5    2.632     5.75
+ BM             4.81 0.828 41.6    3.140     6.48
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 2:
+ contrast estimate    SE    df t.ratio p.value
+ B - BF     -2.559 0.469  88.7  -5.459  <.0001
+ B - BM     -3.235 0.453  95.7  -7.146  <.0001
+ BF - BM    -0.676 0.196 284.3  -3.450  0.0019
+
+field_season = summer, conditionC = 2:
+ contrast estimate    SE    df t.ratio p.value
+ B - BF     -1.105 0.541 264.8  -2.042  0.1043
+ B - BM     -1.725 0.635 277.0  -2.716  0.0192
+ BF - BM    -0.620 0.372 265.0  -1.668  0.2196
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 3 estimates 
+
+> summary(emm.bisexualish.3)
+$emmeans
+field_season = spring, conditionC = 3:
+ detailed_sex emmean    SE   df lower.CL upper.CL
+ B              2.93 0.592 11.5    1.638     4.23
+ BF             3.96 0.573 10.2    2.684     5.23
+ BM             3.69 0.570 10.1    2.423     4.96
+
+field_season = summer, conditionC = 3:
+ detailed_sex emmean    SE   df lower.CL upper.CL
+ B              2.08 0.598 12.2    0.783     3.38
+ BF             1.94 0.627 14.6    0.601     3.28
+ BM             2.54 0.643 16.6    1.182     3.90
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 3:
+ contrast estimate    SE  df t.ratio p.value
+ B - BF     -1.024 0.295 112  -3.475  0.0021
+ B - BM     -0.759 0.275 118  -2.764  0.0181
+ BF - BM     0.264 0.121 273   2.192  0.0744
+
+field_season = summer, conditionC = 3:
+ contrast estimate    SE  df t.ratio p.value
+ B - BF      0.142 0.286 293   0.497  0.8726
+ B - BM     -0.458 0.319 286  -1.434  0.3248
+ BF - BM    -0.600 0.226 267  -2.650  0.0231
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 3 estimates 
+
+> summary(emm.bisexualish.4)
+$emmeans
+field_season = spring, conditionC = 4:
+ detailed_sex emmean    SE   df lower.CL upper.CL
+ B             4.070 0.619 13.3     2.74     5.40
+ BF            3.558 0.616 13.9     2.24     4.88
+ BM            2.353 0.601 12.5     1.05     3.66
+
+field_season = summer, conditionC = 4:
+ detailed_sex emmean    SE   df lower.CL upper.CL
+ B             1.081 0.639 15.1    -0.28     2.44
+ BF           -0.309 0.694 21.3    -1.75     1.13
+ BM            0.271 0.677 19.6    -1.14     1.69
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 4:
+ contrast estimate    SE  df t.ratio p.value
+ B - BF      0.512 0.320 274   1.599  0.2478
+ B - BM      1.717 0.297 271   5.777  <.0001
+ BF - BM     1.205 0.204 265   5.910  <.0001
+
+field_season = summer, conditionC = 4:
+ contrast estimate    SE  df t.ratio p.value
+ B - BF      1.390 0.347 272   4.011  0.0002
+ B - BM      0.810 0.319 273   2.541  0.0310
+ BF - BM    -0.580 0.254 268  -2.278  0.0606
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 3 estimates 
+
+> summary(emm.bisexualish.5)
+$emmeans
+field_season = spring, conditionC = 5:
+ detailed_sex  emmean    SE   df lower.CL upper.CL
+ B             5.2071 0.728 23.1    3.702    6.712
+ BF            3.1599 0.711 24.9    1.694    4.625
+ BM            1.0141 0.678 20.5   -0.399    2.427
+
+field_season = summer, conditionC = 5:
+ detailed_sex  emmean    SE   df lower.CL upper.CL
+ B             0.0795 0.729 23.4   -1.426    1.585
+ BF           -2.5581 0.920 54.0   -4.403   -0.713
+ BM           -1.9988 0.906 52.7   -3.816   -0.182
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 5:
+ contrast estimate    SE  df t.ratio p.value
+ B - BF      2.047 0.516 272   3.965  0.0003
+ B - BM      4.193 0.493 267   8.497  <.0001
+ BF - BM     2.146 0.346 270   6.207  <.0001
+
+field_season = summer, conditionC = 5:
+ contrast estimate    SE  df t.ratio p.value
+ B - BF      2.638 0.638 247   4.132  0.0001
+ B - BM      2.078 0.635 258   3.273  0.0035
+ BF - BM    -0.559 0.423 266  -1.323  0.3837
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 3 estimates
+
+> # like emmeans but with continuous variables
+> trendbisexualish<-emtrends(bisexualishLMM, ~detailed_sex*field_season, var = "conditionC")
+> # above 
+> summary(trendbisexualish)
+ detailed_sex field_season conditionC.trend    SE    df lower.CL upper.CL
+ B            spring                  1.137 0.238  96.1    0.665   1.6097
+ BF           spring                 -0.398 0.193 288.2   -0.778  -0.0182
+ BM           spring                 -1.339 0.178 295.4   -1.688  -0.9895
+ B            summer                 -1.002 0.190 264.6   -1.375  -0.6288
+ BF           summer                 -2.250 0.372 213.2   -2.982  -1.5170
+ BM           summer                 -2.270 0.398 235.8   -3.054  -1.4860
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+> # to get pvalues
+> test(trendbisexualish)
+ detailed_sex field_season conditionC.trend    SE    df t.ratio p.value
+ B            spring                  1.137 0.238  96.1   4.777  <.0001
+ BF           spring                 -0.398 0.193 288.2  -2.063  0.0400
+ BM           spring                 -1.339 0.178 295.4  -7.540  <.0001
+ B            summer                 -1.002 0.190 264.6  -5.286  <.0001
+ BF           summer                 -2.250 0.372 213.2  -6.053  <.0001
+ BM           summer                 -2.270 0.398 235.8  -5.705  <.0001
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+> trendbisexualish.pairwise<-emtrends(bisexualishLMM, pairwise~detailed_sex|field_season, var = "conditionC")
+> # above 
+> summary(trendbisexualish.pairwise) # is there a sig effect of condit for each sex and season
+$emtrends
+field_season = spring:
+ detailed_sex conditionC.trend    SE    df lower.CL upper.CL
+ B                       1.137 0.238  96.1    0.665   1.6097
+ BF                     -0.398 0.193 288.2   -0.778  -0.0182
+ BM                     -1.339 0.178 295.4   -1.688  -0.9895
+
+field_season = summer:
+ detailed_sex conditionC.trend    SE    df lower.CL upper.CL
+ B                      -1.002 0.190 264.6   -1.375  -0.6288
+ BF                     -2.250 0.372 213.2   -2.982  -1.5170
+ BM                     -2.270 0.398 235.8   -3.054  -1.4860
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring:
+ contrast estimate    SE  df t.ratio p.value
+ B - BF     1.5355 0.273 166   5.633  <.0001
+ B - BM     2.4762 0.267 169   9.281  <.0001
+ BF - BM    0.9407 0.160 278   5.897  <.0001
+
+field_season = summer:
+ contrast estimate    SE  df t.ratio p.value
+ B - BF     1.2476 0.353 241   3.534  0.0014
+ B - BM     1.2679 0.388 265   3.265  0.0035
+ BF - BM    0.0203 0.224 265   0.091  0.9955
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 3 estimates 
+
+> # to get pvalues
+> test(trendbisexualish.pairwise) # is the effect of condition sig diff based on sex
+$emtrends
+field_season = spring:
+ detailed_sex conditionC.trend    SE    df t.ratio p.value
+ B                       1.137 0.238  96.1   4.777  <.0001
+ BF                     -0.398 0.193 288.2  -2.063  0.0400
+ BM                     -1.339 0.178 295.4  -7.540  <.0001
+
+field_season = summer:
+ detailed_sex conditionC.trend    SE    df t.ratio p.value
+ B                      -1.002 0.190 264.6  -5.286  <.0001
+ BF                     -2.250 0.372 213.2  -6.053  <.0001
+ BM                     -2.270 0.398 235.8  -5.705  <.0001
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+$contrasts
+field_season = spring:
+ contrast estimate    SE  df t.ratio p.value
+ B - BF     1.5355 0.273 166   5.633  <.0001
+ B - BM     2.4762 0.267 169   9.281  <.0001
+ BF - BM    0.9407 0.160 278   5.897  <.0001
+
+field_season = summer:
+ contrast estimate    SE  df t.ratio p.value
+ B - BF     1.2476 0.353 241   3.534  0.0014
+ B - BM     1.2679 0.388 265   3.265  0.0035
+ BF - BM    0.0203 0.224 265   0.091  0.9955
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: tukey method for comparing a family of 3 estimates 
