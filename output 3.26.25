@@ -1,0 +1,1220 @@
+########################################################################################################################
+#######################################################################################################################
+#                                                         REMINDERS
+#                                               # USE REML to fit random effects 
+#                     working with the monodat file that averages BM and BF individuals into 1 set of data points 
+#                                 from data demo_and_photo_data_2.21.25 tab photo.dat.r.bisexuals
+#                    also with reproductive data file that has only trees reaching reproductive maturity
+#                            TRANSECT as random effect is better than site or a combination of the two
+#                                          condition datatype is numeric, par is factor
+#                   (photo ~ detailed_sex+par+field_season+combined_caliper+condition+RH_S+time_clean+VpdL+Tleaf
+#                                           
+########################################################################################################################
+#######################################################################################################################
+
+######################################################################################################################################
+########   First we ask, is there a difference in photo rates of trees that are reproducing that year vs those not flowering?                                                                           #
+########.  To examine trees reaching reproductive maturity, we will look at reproductive yes / no as a predictor
+######## 
+######################################################################################################################################
+
+#maturity model 
+#3 fit random efects
+# trying a full model
+maturitymodelfull <-lmer(photo ~ repro+par+field_season+combined_caliper+conditionC+RH_S+time_clean+VpdL+Tleaf+
+                           # 2 way
+                           repro:field_season + repro:conditionC + repro:combined_caliper+ condition:field_season+
+                           # 3 way 
+                           repro:field_season:conditionC +
+                           #random effects
+                           (1|transect)+(1+ field_season+ VpdL|tree_code)+ (1|year), 
+                         data=monodat, na.action = na.omit) #lmerControl(optimizer = "bobyqa" )
+# rank deficient warning
+AIC(maturitymodelfull) #6433 
+BIC(maturitymodelfull)  #6631  
+anova(maturitymodelfull) 
+summary(maturitymodelfull)
+
+#Checking random effects - 
+#remove. field_season+ BIC 7050
+# remove + VpdL BIC 6746
+# remove year BIC 6589
+# remove transect (1|transect)+ BIC 6621. <= trywithout transect at end
+#Best random effects is above, proceed to fitting fixed effects
+
+######################################################################################################################################
+### full model            Fitting fixed effects
+maturitymodelfull <-lmer(photo ~ repro+par+field_season+combined_caliper+conditionC+RH_S+time_clean+VpdL+Tleaf+
+                           # 2 way
+                           repro:field_season + repro:conditionC + repro:combined_caliper+ condition:field_season+
+                           # 3 way 
+                           repro:field_season:conditionC +
+                           #random effects
+                           (1|transect)+(1+ field_season+ VpdL|tree_code)+ (1|year), 
+                          REML=FALSE, data=monodat, na.action = na.omit, lmerControl(optimizer = "bobyqa" )) #
+# rank deficient
+AIC(maturitymodelfull) # 6355 (#6352 without condition:field_season+)
+BIC(maturitymodelfull)   # 6552 (#6503 without condition:field_season+)
+anova(maturitymodelfull) #  RH and time and threeway NS
+summary(maturitymodelfull)
+
+rm(maturitymodelfull)
+# model minus RH, solves rank deficiency problem
+maturitymodelfull.1 <-lmer(photo ~ repro+par+field_season+combined_caliper+conditionC+time_clean+VpdL+Tleaf+
+                             # 2 way
+                             repro:field_season + repro:conditionC +  conditionC: field_season+ repro:combined_caliper+
+                             # 3 way 
+                             repro:field_season:conditionC +
+                             #random effects
+                             (1|transect)+(1+ field_season+ VpdL|tree_code)+ (1|year), 
+                           REML=FALSE, data=monodat, na.action = na.omit, lmerControl(optimizer = "bobyqa" )) #
+
+AIC(maturitymodelfull.1) #6351
+BIC(maturitymodelfull.1)   #6496
+anova(maturitymodelfull.1) # everything significant except time and three way
+summary(maturitymodelfull.1)
+#residuals look fine
+
+# remove RH, three way. # 3 way  repro:field_season:conditionC +
+maturitymodel.1 <-lmer(photo ~ repro+par+field_season+combined_caliper+conditionC+time_clean+VpdL+Tleaf+
+                             # 2 way
+                             repro:field_season + repro:conditionC +  conditionC: field_season+ repro:combined_caliper+
+                             #random effects
+                             (1|transect)+(1+ field_season+ VpdL|tree_code)+ (1|year), 
+                           REML=FALSE, data=monodat, na.action = na.omit, lmerControl(optimizer = "bobyqa" )) #
+
+AIC(maturitymodel.1) #6350
+BIC(maturitymodel.1)   #6490
+anova(maturitymodel.1) # everything significant except time
+summary(maturitymodel.1)
+#residuals look fine
+
+######################################################################################################################################
+###                    Chaecking random effects, back to REML 
+
+maturitymodel.1 <-lmer(photo ~ repro+par+field_season+combined_caliper+conditionC+time_clean+VpdL+Tleaf+
+                             # 2 way
+                             repro:field_season + repro:conditionC + repro:combined_caliper+ conditionC: field_season+
+                             #random effects
+                             (1|transect)+(1+ field_season+ VpdL|tree_code)+ (1|year), 
+                             data=monodat, na.action = na.omit) #, lmerControl(optimizer = "bobyqa" )) #
+
+AIC(maturitymodel.1) #6407
+BIC(maturitymodel.1)   #6546 # model is not better without transect
+anova(maturitymodel.1) 
+summary(maturitymodel.1)
+results.maturitymodel.1<-Anova(maturitymodel.1, test.statistic = "F")  
+#this takes forever. let it run. Gives a type II anova results table. (on Mar 26 2025, could never get this to resolve)
+results.maturitymodel.1
+
+#use to plot model predicted values vs. residuals
+residuals <- residuals(maturitymodel.1)
+predvalues <- predict(maturitymodel.1)
+
+plot(x=predvalues, y=residuals,
+     xlab = 'predicted',
+     Ylab = 'actual',
+     Main = 'maturitymodelfull.1 residuals')#residuals look fine
+
+     
+     > AIC(maturitymodel.1) #6407
+[1] 6407.346
+> BIC(maturitymodel.1)   #6546 # model is not better without transect
+[1] 6546.648
+> anova(maturitymodel.1) 
+Type III Analysis of Variance Table with Satterthwaite's method
+                        Sum Sq Mean Sq NumDF   DenDF  F value    Pr(>F)    
+repro                     1.23   1.226     1  935.79   2.2047 0.1379230    
+par                     510.61 170.203     3 2035.37 306.1708 < 2.2e-16 ***
+field_season              0.00   0.000     1  226.12   0.0000 0.9984492    
+combined_caliper          5.07   5.066     1  673.29   9.1138 0.0026327 ** 
+conditionC                6.76   6.758     1  369.53  12.1565 0.0005480 ***
+time_clean                1.18   1.176     1 2274.91   2.1150 0.1459994    
+VpdL                     36.65  36.647     1  175.15  65.9226 8.033e-14 ***
+Tleaf                   250.03 250.033     1 2328.07 449.7748 < 2.2e-16 ***
+repro:field_season        5.20   5.201     1  966.96   9.3553 0.0022846 ** 
+repro:conditionC          7.62   7.624     1 1121.98  13.7152 0.0002231 ***
+repro:combined_caliper    3.49   3.491     1  732.71   6.2801 0.0124259 *  
+field_season:conditionC  24.37  24.370     1  318.37  43.8375 1.517e-10 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> summary(maturitymodel.1)
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: photo ~ repro + par + field_season + combined_caliper + conditionC +  
+    time_clean + VpdL + Tleaf + repro:field_season + repro:conditionC +  
+    repro:combined_caliper + conditionC:field_season + (1 | transect) +  
+    (1 + field_season + VpdL | tree_code) + (1 | year)
+   Data: monodat
+
+REML criterion at convergence: 6359.3
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.9574 -0.5575  0.0059  0.5728  3.2778 
+
+Random effects:
+ Groups    Name               Variance Std.Dev. Corr       
+ tree_code (Intercept)        1.37837  1.1740              
+           field_seasonsummer 1.25689  1.1211   -0.26      
+           VpdL               2.96760  1.7227   -0.90  0.01
+ transect  (Intercept)        0.45284  0.6729              
+ year      (Intercept)        0.01452  0.1205              
+ Residual                     0.55591  0.7456              
+Number of obs: 2451, groups:  tree_code, 135; transect, 14; year, 3
+
+Fixed effects:
+                                Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                    4.068e-01  3.405e-01  9.413e+01   1.195 0.235186    
+reproN                        -4.758e-01  1.897e-01  9.446e+02  -2.508 0.012303 *  
+par500                         8.290e-01  4.271e-02  2.001e+03  19.411  < 2e-16 ***
+par1000                        1.104e+00  4.366e-02  2.041e+03  25.281  < 2e-16 ***
+par1500                        1.252e+00  4.564e-02  2.105e+03  27.431  < 2e-16 ***
+field_seasonsummer            -2.061e-01  2.388e-01  2.834e+02  -0.863 0.388856    
+combined_caliper              -1.866e-02  1.094e-02  1.637e+02  -1.705 0.090001 .  
+conditionC                     5.636e-03  4.501e-02  2.305e+02   0.125 0.900462    
+time_clean                     5.746e-01  3.951e-01  2.275e+03   1.454 0.145999    
+VpdL                          -1.706e+00  2.101e-01  1.752e+02  -8.119 8.03e-14 ***
+Tleaf                          2.059e-01  9.709e-03  2.328e+03  21.208  < 2e-16 ***
+reproN:field_seasonsummer      4.113e-01  1.345e-01  9.670e+02   3.059 0.002285 ** 
+reproN:conditionC              1.914e-01  5.168e-02  1.122e+03   3.703 0.000223 ***
+reproN:combined_caliper       -1.517e-01  6.054e-02  7.327e+02  -2.506 0.012426 *  
+field_seasonsummer:conditionC -4.650e-01  7.023e-02  3.184e+02  -6.621 1.52e-10 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation matrix not shown by default, as p = 15 > 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it
+
+# comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
+#emMat<- emmeans(maturitymodelfull.1, pairwise~repro|field_season*conditionC)  
+emMat<- emmeans(maturitymodel.1, pairwise~repro|field_season*conditionC*repro) 
+# above averages over all condition types
+summary(emMat)
+confint(emMat)
+#
+> # above averages over all condition types
+> summary(emMat)
+$emmeans
+field_season = spring, conditionC = 2.73:
+ repro emmean    SE   df lower.CL upper.CL
+ R       4.02 0.210 15.6     3.57     4.46
+ N       3.34 0.252 32.0     2.83     3.85
+
+field_season = summer, conditionC = 2.73:
+ repro emmean    SE   df lower.CL upper.CL
+ R       2.54 0.222 19.8     2.08     3.01
+ N       2.28 0.263 38.4     1.74     2.81
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 2.73:
+ contrast estimate    SE   df t.ratio p.value
+ R - N       0.680 0.156  852   4.365  <.0001
+
+field_season = summer, conditionC = 2.73:
+ contrast estimate    SE   df t.ratio p.value
+ R - N       0.268 0.169 1302   1.588  0.1125
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> confint(emMat)
+$emmeans
+field_season = spring, conditionC = 2.73:
+ repro emmean    SE   df lower.CL upper.CL
+ R       4.02 0.210 15.6     3.57     4.46
+ N       3.34 0.252 32.0     2.83     3.85
+
+field_season = summer, conditionC = 2.73:
+ repro emmean    SE   df lower.CL upper.CL
+ R       2.54 0.222 19.8     2.08     3.01
+ N       2.28 0.263 38.4     1.74     2.81
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 2.73:
+ contrast estimate    SE   df lower.CL upper.CL
+ R - N       0.680 0.156  852   0.3741    0.985
+
+field_season = summer, conditionC = 2.73:
+ contrast estimate    SE   df lower.CL upper.CL
+ R - N       0.268 0.169 1302  -0.0631    0.600
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+# comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
+emMat.0<- emmeans(maturitymodel.1, pairwise~repro|field_season*conditionC, at= list(conditionC = 0)) 
+emMat.1<- emmeans(maturitymodel.1, pairwise~repro|field_season*conditionC, at= list(conditionC = 1)) 
+emMat.2<- emmeans(maturitymodel.1, pairwise~repro|field_season*conditionC, at= list(conditionC = 2)) 
+emMat.3<- emmeans(maturitymodel.1, pairwise~repro|field_season*conditionC, at= list(conditionC = 3)) 
+emMat.4<- emmeans(maturitymodel.1, pairwise~repro|field_season*conditionC, at= list(conditionC = 4)) 
+emMat.5<- emmeans(maturitymodel.1, pairwise~repro|field_season*conditionC, at= list(conditionC = 5)) 
+# above looks at one level of condition - maturity model
+summary(emMat.0)
+summary(emMat.1)
+summary(emMat.2)
+summary(emMat.3)
+summary(emMat.4)
+summary(emMat.5)
+
+> # above looks at one level of condition - maturity model
+> summary(emMat.0)
+$emmeans
+field_season = spring, conditionC = 0:
+ repro emmean    SE   df lower.CL upper.CL
+ R       4.00 0.248 29.8     3.50     4.51
+ N       2.80 0.297 60.8     2.21     3.40
+
+field_season = summer, conditionC = 0:
+ repro emmean    SE   df lower.CL upper.CL
+ R       3.80 0.287 51.4     3.22     4.37
+ N       3.01 0.320 80.1     2.37     3.64
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 0:
+ contrast estimate    SE   df t.ratio p.value
+ R - N        1.20 0.221 1116   5.435  <.0001
+
+field_season = summer, conditionC = 0:
+ contrast estimate    SE   df t.ratio p.value
+ R - N        0.79 0.232 1356   3.410  0.0007
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emMat.1)
+$emmeans
+field_season = spring, conditionC = 1:
+ repro emmean    SE   df lower.CL upper.CL
+ R       4.01 0.227 21.2     3.54     4.48
+ N       3.00 0.272 43.1     2.45     3.55
+
+field_season = summer, conditionC = 1:
+ repro emmean    SE   df lower.CL upper.CL
+ R       3.34 0.252 32.0     2.82     3.85
+ N       2.74 0.287 53.1     2.16     3.31
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 1:
+ contrast estimate    SE   df t.ratio p.value
+ R - N       1.010 0.187 1028   5.389  <.0001
+
+field_season = summer, conditionC = 1:
+ contrast estimate    SE   df t.ratio p.value
+ R - N       0.599 0.200 1359   3.003  0.0027
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emMat.2)
+$emmeans
+field_season = spring, conditionC = 2:
+ repro emmean    SE   df lower.CL upper.CL
+ R       4.01 0.213 16.8     3.56     4.46
+ N       3.19 0.256 34.2     2.67     3.71
+
+field_season = summer, conditionC = 2:
+ repro emmean    SE   df lower.CL upper.CL
+ R       2.88 0.229 22.3     2.40     3.35
+ N       2.47 0.267 40.6     1.93     3.01
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 2:
+ contrast estimate    SE   df t.ratio p.value
+ R - N       0.819 0.164  919   4.997  <.0001
+
+field_season = summer, conditionC = 2:
+ contrast estimate    SE   df t.ratio p.value
+ R - N       0.408 0.177 1335   2.304  0.0214
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emMat.3)
+$emmeans
+field_season = spring, conditionC = 3:
+ repro emmean    SE   df lower.CL upper.CL
+ R       4.02 0.209 15.6     3.57     4.46
+ N       3.39 0.252 32.0     2.88     3.90
+
+field_season = summer, conditionC = 3:
+ repro emmean    SE   df lower.CL upper.CL
+ R       2.42 0.221 19.6     1.96     2.88
+ N       2.20 0.264 39.0     1.67     2.74
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 3:
+ contrast estimate    SE   df t.ratio p.value
+ R - N       0.628 0.155  836   4.050  0.0001
+
+field_season = summer, conditionC = 3:
+ contrast estimate    SE   df t.ratio p.value
+ R - N       0.216 0.168 1289   1.287  0.1984
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emMat.4)
+$emmeans
+field_season = spring, conditionC = 4:
+ repro emmean    SE   df lower.CL upper.CL
+ R       4.03 0.215 17.3     3.57     4.48
+ N       3.59 0.260 36.0     3.06     4.12
+
+field_season = summer, conditionC = 4:
+ repro emmean    SE   df lower.CL upper.CL
+ R       1.96 0.230 22.9     1.48     2.43
+ N       1.93 0.278 47.8     1.37     2.49
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 4:
+ contrast estimate    SE   df t.ratio p.value
+ R - N      0.4363 0.163  826   2.674  0.0076
+
+field_season = summer, conditionC = 4:
+ contrast estimate    SE   df t.ratio p.value
+ R - N      0.0249 0.175 1253   0.142  0.8868
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emMat.5)
+$emmeans
+field_season = spring, conditionC = 5:
+ repro emmean    SE   df lower.CL upper.CL
+ R       4.03 0.230 22.4    3.554     4.51
+ N       3.79 0.279 47.0    3.224     4.35
+
+field_season = summer, conditionC = 5:
+ repro emmean    SE   df lower.CL upper.CL
+ R       1.50 0.253 33.5    0.984     2.02
+ N       1.67 0.307 69.8    1.053     2.28
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 5:
+ contrast estimate    SE   df t.ratio p.value
+ R - N       0.245 0.186  876   1.315  0.1888
+
+field_season = summer, conditionC = 5:
+ contrast estimate    SE   df t.ratio p.value
+ R - N      -0.166 0.196 1238  -0.848  0.3965
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+# like emmeans but with continuous variables
+trendemMat<-emtrends(maturitymodel.1, ~repro*field_season, var = "conditionC")
+  
+summary(trendemMat)
+# to get pvalues
+test(trendemMat)
+
+> summary(trendemMat)
+ repro field_season conditionC.trend     SE  df lower.CL upper.CL
+ R     spring                0.00564 0.0458 303  -0.0844   0.0957
+ N     spring                0.19702 0.0558 608   0.0874   0.3067
+ R     summer               -0.45935 0.0613 517  -0.5797  -0.3390
+ N     summer               -0.26796 0.0682 944  -0.4018  -0.1341
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+> # to get pvalues
+> test(trendemMat)
+ repro field_season conditionC.trend     SE  df t.ratio p.value
+ R     spring                0.00564 0.0458 303   0.123  0.9020
+ N     spring                0.19702 0.0558 608   3.529  0.0004
+ R     summer               -0.45935 0.0613 517  -7.497  <.0001
+ N     summer               -0.26796 0.0682 944  -3.928  0.0001
+
+# pairwise comparisons
+trendemMat.pairwise<-emtrends(maturitymodel.1, pairwise~field_season, var = "conditionC")
+trendemMat.pairwise
+summary(trendemMat.pairwise) 
+# to get pvalues
+test(trendemMat.pairwise) 
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+> trendemMat.pairwise
+$emtrends
+ field_season conditionC.trend     SE  df lower.CL upper.CL
+ spring                  0.101 0.0439 318    0.015    0.188
+ summer                 -0.364 0.0594 560   -0.480   -0.247
+
+Results are averaged over the levels of: repro, par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+ contrast        estimate     SE  df t.ratio p.value
+ spring - summer    0.465 0.0711 400   6.543  <.0001
+
+Results are averaged over the levels of: repro, par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(trendemMat.pairwise) 
+$emtrends
+ field_season conditionC.trend     SE  df lower.CL upper.CL
+ spring                  0.101 0.0439 318    0.015    0.188
+ summer                 -0.364 0.0594 560   -0.480   -0.247
+
+Results are averaged over the levels of: repro, par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+ contrast        estimate     SE  df t.ratio p.value
+ spring - summer    0.465 0.0711 400   6.543  <.0001
+
+Results are averaged over the levels of: repro, par 
+Degrees-of-freedom method: kenward-roger 
+
+> # to get pvalues
+> test(trendemMat.pairwise) 
+$emtrends
+ field_season conditionC.trend     SE  df t.ratio p.value
+ spring                  0.101 0.0439 318   2.310  0.0215
+ summer                 -0.364 0.0594 560  -6.127  <.0001
+
+Results are averaged over the levels of: repro, par 
+Degrees-of-freedom method: kenward-roger 
+
+$contrasts
+ contrast        estimate     SE  df t.ratio p.value
+ spring - summer    0.465 0.0711 400   6.543  <.0001
+
+Results are averaged over the levels of: repro, par 
+Degrees-of-freedom method: kenward-roger
+
+####
+#use to plot model predicted values vs. residuals
+residuals <- residuals(maturitymodelfull.1)
+predvalues <- predict(maturitymodelfull.1)
+
+plot(x=predvalues, y=residuals,
+     xlab = 'predicted',
+     Ylab = 'actual',
+     Main = 'residuals')
+
+######################################################################################################################################
+#######                                        Now time to look just at reproductive trees. 
+#######     For the model with three sexes, M, F, and B with all B,BM,BF lumped into B, check out code from 3.13.25
+#######                                    This division of sex is a bit problematic, since 
+#######                 data are missing NOT at random in summer (BF maybe overepresented by 16-24 measurements)
+#######
+######################################################################################################################################
+
+######################################################################################################################################
+#######                        So here, we take all B trees and lump them in with females
+#######                    Use reproductives data file (filtered from monodat (i.e averaged B data))
+#######                    Jennifer prefers this model, but Kim doesn't want all B data to be averaged
+#######                           Both models are here; takehome message is commensurate
+######################################################################################################################################
+# make a new datatable that just has reproductively mature trees
+# pulls out the data we want to look at
+reproductives <- filter(monodat, sex == "M" |sex == "F"| sex == "B")
+str(reproductives)
+summary(reproductives$sex)
+table(reproductives$sex)
+#M    B    F 
+#1063  248  231 
+summary(reproductives$simplesex)
+table(reproductives$simplesex)
+#M    F 
+#1063  479 
+#set levels to get rid of N
+reproductives$sex  <- factor(reproductives$sex , levels = c("M", "B", "F"))
+reproductives$simplesex  <- factor(reproductives$simplesex , levels = c("M", "F"))
+
+
+######################################################################################################
+# fitting random effects
+### using reproductives, only M and F with ALL B records rolled into F
+MFrmodel <-lmer(photo ~ simplesex+par+field_season+combined_caliper+conditionC+RH_S+time_clean+VpdL+Tleaf+
+                  # 2 way
+                  simplesex:field_season + simplesex:conditionC + simplesex:combined_caliper+ field_season:conditionC +
+                  # 3 way
+                  simplesex:field_season:conditionC +
+                  #random effects
+                  (1|transect)+(1+ field_season+VpdL|tree_code)+ (1|year), 
+                  data=reproductives, na.action = na.omit)
+
+
+AIC(MFrmodel) #3965
+BIC(MFrmodel) #4103 
+anova(MFrmodel) 
+summary(MFrmodel) 
+
+######################################################################################################
+# fitting fixed effects
+### using reproductives, only M and F
+MFrmodel <-lmer(photo ~ simplesex+par+field_season+combined_caliper+conditionC+RH_S+time_clean+VpdL+Tleaf+
+                  # 2 way
+                  simplesex:field_season + simplesex:conditionC + simplesex:combined_caliper+ field_season:conditionC +
+                  # 3 way
+                  simplesex:field_season:conditionC +
+                  #random effects
+                  (1|transect)+(1+ field_season+VpdL|tree_code)+ (1|year), 
+                  REML = FALSE, data=reproductives, na.action = na.omit)
+
+
+AIC(MFrmodel) #3905
+BIC(MFrmodel) #4043 # moving to MF only improved the model
+anova(MFrmodel) 
+summary(MFrmodel) 
+
+#this model matches with what is going on out in the woods
+MFrmodel.1 <-lmer(photo ~ simplesex+par+field_season+combined_caliper+conditionC+time_clean+VpdL+Tleaf+
+                    # 2 way
+                    simplesex:field_season + 
+                    #random effects
+                    (1|transect)+(1+ field_season+VpdL|tree_code)+ (1|year), 
+                  REML=FALSE, data=reproductives, na.action = na.omit, lmerControl(optimizer = "bobyqa" )) 
+#sometimes helps in convergence compared to default)
+
+AIC(MFrmodel.1) 
+BIC(MFrmodel.1) 
+anova(MFrmodel.1) 
+summary(MFrmodel.1) 
+# whole model  #3905, #4043 3-way NS
+# no 3way 3903, 4036
+# no 3way, no sex and condition - 3902, 4029
+# no 3way, no sex and condition, no sex and caliper - 3901, 4023
+# no 3way, no sex and condition, no sex and caliper, no RH - 3899, 4016
+# no 3way, no sex and condition, no sex and caliper, no RH, no season and condition - 3919, 4031
+
+#this is the best model from above BIC #4016
+MFrmodel.2 <-lmer(photo ~ simplesex+par+field_season+combined_caliper+conditionC+time_clean+VpdL+Tleaf+
+                    # 2 way
+                    simplesex:field_season + field_season:conditionC+
+                    #random effects
+                    (1|transect)+(1+ field_season+VpdL|tree_code)+ (1|year), 
+                  REML=FALSE, data=reproductives, na.action = na.omit, lmerControl(optimizer = "bobyqa" )) 
+#sometimes helps in convergence compared to default)
+
+AIC(MFrmodel.2) #3899
+BIC(MFrmodel.2) #4016
+anova(MFrmodel.2) 
+summary(MFrmodel.2) 
+
+############################################################################################
+# fitting random effects again, go back to REML, take out bobyqa optimization
+
+#this model matches with what is going on out in the woods
+MFrmodel.2 <-lmer(photo ~ simplesex+par+field_season+combined_caliper+conditionC+time_clean+VpdL+Tleaf+
+                    # 2 way
+                    simplesex:field_season + field_season:conditionC+
+                    #random effects
+                    (1|transect)+(1+ field_season+VpdL|tree_code)+ (1|year), 
+                    data=reproductives, na.action = na.omit) #lmerControl(optimizer = "bobyqa" )
+#sometimes helps in convergence compared to default)
+
+AIC(MFrmodel.2) #3942
+BIC(MFrmodel.2) #4058
+anova(MFrmodel.2) 
+summary(MFrmodel.2) 
+results.MFrmodel.2<-Anova(MFrmodel.2,test.statistic = "F")  #this takes forever. let it run. Gives a type II anova results table. 
+#residuals look fine
+
+> AIC(MFrmodel.2) #3942
+[1] 3941.593
+> BIC(MFrmodel.2) #4058
+[1] 4058.499
+> anova(MFrmodel.2) 
+Type III Analysis of Variance Table with Satterthwaite's method
+                        Sum Sq Mean Sq NumDF   DenDF  F value    Pr(>F)    
+simplesex                 0.70   0.698     1  347.53   1.3282   0.24992    
+par                     347.89 115.963     3 1209.29 220.7338 < 2.2e-16 ***
+field_season              0.05   0.052     1  173.33   0.0983   0.75422    
+combined_caliper          2.51   2.509     1  109.76   4.7763   0.03098 *  
+conditionC               22.22  22.223     1  202.34  42.3011 6.006e-10 ***
+time_clean                0.32   0.316     1 1237.50   0.6012   0.43827    
+VpdL                     28.94  28.942     1  134.79  55.0909 1.168e-11 ***
+Tleaf                   165.23 165.227     1 1392.95 314.5081 < 2.2e-16 ***
+simplesex:field_season    2.92   2.920     1  325.57   5.5577   0.01899 *  
+field_season:conditionC  14.72  14.719     1  193.45  28.0181 3.243e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> summary(MFrmodel.2) 
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: photo ~ simplesex + par + field_season + combined_caliper + conditionC +  
+    time_clean + VpdL + Tleaf + simplesex:field_season + field_season:conditionC +  
+    (1 | transect) + (1 + field_season + VpdL | tree_code) +      (1 | year)
+   Data: reproductives
+
+REML criterion at convergence: 3897.6
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-4.2097 -0.5404 -0.0143  0.5343  3.2558 
+
+Random effects:
+ Groups    Name               Variance Std.Dev. Corr       
+ tree_code (Intercept)        1.25098  1.1185              
+           field_seasonsummer 1.57478  1.2549   -0.26      
+           VpdL               2.80428  1.6746   -0.87  0.08
+ transect  (Intercept)        0.22791  0.4774              
+ year      (Intercept)        0.02136  0.1462              
+ Residual                     0.52535  0.7248              
+Number of obs: 1501, groups:  tree_code, 99; transect, 14; year, 3
+
+Fixed effects:
+                                Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                      1.07894    0.39500  177.33460   2.732  0.00694 ** 
+simplesexF                       0.12095    0.12913  259.19409   0.937  0.34981    
+par500                           0.87023    0.05318 1179.16523  16.365  < 2e-16 ***
+par1000                          1.17072    0.05452 1214.90867  21.474  < 2e-16 ***
+par1500                          1.33942    0.05727 1269.87406  23.388  < 2e-16 ***
+field_seasonsummer               0.15142    0.31124  129.94374   0.487  0.62742    
+combined_caliper                -0.02821    0.01291  109.75802  -2.185  0.03098 *  
+conditionC                      -0.09308    0.05461  149.30671  -1.704  0.09037 .  
+time_clean                      -0.41239    0.53186 1237.49611  -0.775  0.43827    
+VpdL                            -1.94000    0.26137  134.78813  -7.422 1.17e-11 ***
+Tleaf                            0.21710    0.01224 1392.94900  17.734  < 2e-16 ***
+simplesexF:field_seasonsummer   -0.50502    0.21422  325.57412  -2.357  0.01899 *  
+field_seasonsummer:conditionC   -0.48797    0.09219  193.45208  -5.293 3.24e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation matrix not shown by default, as p = 13 > 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it
+
+
+# comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
+emrepMF<- emmeans(MFrmodel.2, pairwise~simplesex|field_season*conditionC)  
+# above averages over all condition types
+summary(emrepMF)
+
+
+> # above averages over all condition types
+> summary(emrepMF)
+$emmeans
+field_season = spring, conditionC = 3.09:
+ simplesex emmean    SE   df lower.CL upper.CL
+ M           3.94 0.180 14.3     3.55     4.32
+ F           4.06 0.198 20.4     3.64     4.47
+
+field_season = summer, conditionC = 3.09:
+ simplesex emmean    SE   df lower.CL upper.CL
+ M           2.58 0.216 28.9     2.14     3.02
+ F           2.20 0.235 39.8     1.72     2.67
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 3.09:
+ contrast estimate    SE  df t.ratio p.value
+ M - F      -0.121 0.132 326  -0.916  0.3605
+
+field_season = summer, conditionC = 3.09:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.384 0.183 549   2.100  0.0362
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+# all these comparisons will be the same, since condition is no involved in an interaction with sex 
+# comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
+#emsimpleMF2.0<- emmeans(MFrmodel.2, pairwise~simplesex|field_season*conditionC, at= list(conditionC = 0)) 
+#emsimpleMF2.1<- emmeans(MFrmodel.2, pairwise~simplesex|field_season*conditionC, at= list(conditionC = 1)) 
+#emsimpleMF2.2<- emmeans(MFrmodel.2, pairwise~simplesex|field_season*conditionC, at= list(conditionC = 2)) 
+#emsimpleMF2.3<- emmeans(MFrmodel.2, pairwise~simplesex|field_season*conditionC, at= list(conditionC = 3)) 
+#emsimpleMF2.4<- emmeans(MFrmodel.2, pairwise~simplesex|field_season*conditionC, at= list(conditionC = 4)) 
+#emsimpleMF2.5<- emmeans(MFrmodel.2, pairwise~simplesex|field_season*conditionC, at= list(conditionC = 5)) 
+# above looks at one level of condition
+#summary(emsimpleMF2.0)
+#summary(emsimpleMF2.1)
+#summary(emsimpleMF2.2)
+#summary(emsimpleMF2.3)
+#summary(emsimpleMF2.4)
+#summary(emsimpleMF2.5)
+
+# like emmeans but with continuous variables
+trendMFsimple2<-emtrends(MFrmodel.2, ~simplesex*field_season, var = "conditionC")
+# above 
+summary(trendMFsimple2)
+# to get pvalues
+test(trendMFsimple2)
+
+
+> # above 
+> summary(trendMFsimple2)
+ simplesex field_season conditionC.trend     SE  df lower.CL upper.CL
+ M         spring                -0.0931 0.0563 191   -0.204    0.018
+ F         spring                -0.0931 0.0563 191   -0.204    0.018
+ M         summer                -0.5811 0.0831 349   -0.745   -0.418
+ F         summer                -0.5811 0.0831 349   -0.745   -0.418
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+> # to get pvalues
+> test(trendMFsimple2)
+ simplesex field_season conditionC.trend     SE  df t.ratio p.value
+ M         spring                -0.0931 0.0563 191  -1.653  0.1000
+ F         spring                -0.0931 0.0563 191  -1.653  0.1000
+ M         summer                -0.5811 0.0831 349  -6.990  <.0001
+ F         summer                -0.5811 0.0831 349  -6.990  <.0001
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+######################################################################################################################################
+#######
+#######                                                         for males and mixed females only, no BM
+#######                                          Don't use monodat data, instead, start with dat2 and make a new file
+#######                                                         MFbdat has all Bf and B as Females
+######################################################################################################################################
+str(dat2)
+table (dat2$keep)
+dat2$conditionC <- as.numeric(dat2$condition)
+
+# pulls out the data we want to look at
+# reproductive trees only
+# new data frame with no records from BM trees, all BF and B put in with F
+# subset by multiple conditions using |      subset(df, gender == 'M' | state == 'PH')
+# MFbdat<-dat2 %>% filter(MFsex == "F" | MFsex =="M" )
+MFbdat <- filter(dat2, detailed_sex == "F" | detailed_sex =="M" |detailed_sex == "BF" | detailed_sex =="B" )
+summary(MFbdat$detailed_sex)
+#Recoding sex columns
+MFbdat$MFsex <- fct_recode(MFbdat$detailed_sex, F = "B", F = "BF")  # all bisexuals  and BF become F, but BM is dropped
+summary(MFbdat$MFsex)
+
+table(MFbdat$keep)
+table(MFbdat$MFsex)
+table(MFbdat$simplesex) # should be the same as above; it is
+str(MFbdat)
+
+######################################################################################################
+# fitting random effects
+### using reproductives, only M and F including b and bf
+revisedMFbrmodel <-lmer(photo ~ simplesex+par+field_season+combined_caliper+conditionC+RH_S+time_clean+VpdL+Tleaf+
+                         # 2 way
+                         simplesex:field_season + simplesex:conditionC + simplesex:combined_caliper+ field_season:conditionC +
+                         # 3 way
+                         simplesex:field_season:conditionC +
+                         #random effects
+                          (1|transect)+(1+ field_season+VpdL|tree_code), 
+                       data=MFbdat, na.action = na.omit)
+
+
+BIC(revisedMFbrmodel) #4116
+# remove 
+# (1|transect)+  BIC #4115, 
+# + (1|year).    BIC #4120  
+# + field_season BIC #4438. 
+# +VpdL          BIC #3225. 
+# random effect full are one of best, proceed (but reinvestigate removing transect)
+anova(revisedMFbrmodel) 
+summary(revisedMFbrmodel) 
+
+
+
+######################################################################################################
+# fitting fixed effects
+### using reproductives, only M and F (which. include B and BF)
+revisedMFbrmodel <-lmer(photo ~ simplesex+par+field_season+combined_caliper+conditionC+RH_S+time_clean+VpdL+Tleaf+
+                          # 2 way
+                          simplesex:field_season + simplesex:conditionC + simplesex:combined_caliper+ field_season:conditionC +
+                          # 3 way
+                          simplesex:field_season:conditionC +
+                          #random effects
+                          (1|transect)+(1+ field_season+VpdL|tree_code), 
+                        REML = FALSE, data=MFbdat, na.action = na.omit)
+
+BIC(revisedMFbrmodel) #4060
+anova(revisedMFbrmodel) 
+summary(revisedMFbrmodel) 
+
+# fitting fixed effects
+### using reproductives, only M and F (which. include B and BF)
+revisedMFbrmodel <-lmer(photo ~ simplesex+par+field_season+combined_caliper+conditionC+time_clean+VpdL+Tleaf+
+                          # 2 way
+                          simplesex:field_season +  field_season:conditionC +
+                          #random effects
+                          (1|transect)+(1+ field_season+VpdL|tree_code), 
+                        REML = FALSE, data=MFbdat, na.action = na.omit)
+
+BIC(revisedMFbrmodel) #4060
+anova(revisedMFbrmodel) 
+summary(revisedMFbrmodel) 
+# remove 
+# three-way interaction simplesex:field_season:conditionC +. BIC 4053
+# then remove two-way simplesex:combined_caliper+            BIC 4046
+# then remove two way simplesex:conditionC +                 BIC 4040
+# then remove +RH_S                                          BIC 4032
+# removing time clean bumps up AIC to 4049
+
+############################################################################################
+# fitting random effects again, go back to REML, take out bobyqa optimization
+
+
+### using reproductives, only M and F (which. include B and BF)
+revisedMFbrmodel <-lmer(photo ~ simplesex+par+field_season+combined_caliper+conditionC+time_clean+VpdL+Tleaf+
+                          # 2 way
+                          simplesex:field_season +  field_season:conditionC +
+                          #random effects
+                          (1|transect)+(1+ field_season+VpdL|tree_code), 
+                          data=MFbdat, na.action = na.omit)
+
+BIC(revisedMFbrmodel) #4075
+anova(revisedMFbrmodel) 
+summary(revisedMFbrmodel) 
+
+
+> BIC(revisedMFbrmodel) #4075
+[1] 4075.356
+> anova(revisedMFbrmodel) 
+Type III Analysis of Variance Table with Satterthwaite's method
+                        Sum Sq Mean Sq NumDF   DenDF  F value    Pr(>F)    
+simplesex                 4.37   4.366     1  349.02   8.2180  0.004399 ** 
+par                     364.21 121.404     3 1212.59 228.5162 < 2.2e-16 ***
+field_season              3.50   3.497     1  155.01   6.5832  0.011243 *  
+combined_caliper          2.44   2.440     1   87.86   4.5933  0.034860 *  
+conditionC               19.53  19.526     1  211.11  36.7533 6.096e-09 ***
+time_clean                1.40   1.402     1 1359.21   2.6381  0.104560    
+VpdL                     41.25  41.254     1  132.08  77.6514 6.145e-15 ***
+Tleaf                   191.58 191.578     1 1370.01 360.6037 < 2.2e-16 ***
+simplesex:field_season    2.41   2.414     1  360.31   4.5444  0.033703 *  
+field_season:conditionC  12.57  12.573     1  195.30  23.6652 2.355e-06 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> summary(revisedMFbrmodel) 
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: photo ~ simplesex + par + field_season + combined_caliper + conditionC +  
+    time_clean + VpdL + Tleaf + simplesex:field_season + field_season:conditionC +  
+    (1 | transect) + (1 + field_season + VpdL | tree_code)
+   Data: MFbdat
+
+REML criterion at convergence: 3921.8
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-4.1512 -0.5345 -0.0092  0.5475  3.2997 
+
+Random effects:
+ Groups    Name               Variance Std.Dev. Corr       
+ tree_code (Intercept)        1.3025   1.1413              
+           field_seasonsummer 1.5966   1.2636   -0.25      
+           VpdL               2.9511   1.7179   -0.85  0.03
+ transect  (Intercept)        0.1832   0.4280              
+ Residual                     0.5313   0.7289              
+Number of obs: 1502, groups:  tree_code, 99; transect, 14
+
+Fixed effects:
+                                Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                      1.10699    0.38529  247.06007   2.873  0.00442 ** 
+simplesexM                       0.10338    0.13249  321.41719   0.780  0.43577    
+par500                           0.87600    0.05348 1184.97419  16.380  < 2e-16 ***
+par1000                          1.18730    0.05465 1217.10856  21.727  < 2e-16 ***
+par1500                          1.36440    0.05709 1268.18298  23.899  < 2e-16 ***
+field_seasonsummer              -0.86507    0.29834  238.60033  -2.900  0.00408 ** 
+combined_caliper                -0.03054    0.01425   87.85568  -2.143  0.03486 *  
+conditionC                      -0.08663    0.05802  150.33732  -1.493  0.13753    
+time_clean                      -0.82379    0.50719 1359.20823  -1.624  0.10456    
+VpdL                            -2.29409    0.26034  132.07953  -8.812 6.15e-15 ***
+Tleaf                            0.23045    0.01214 1370.01189  18.990  < 2e-16 ***
+simplesexM:field_seasonsummer    0.45604    0.21393  360.30751   2.132  0.03370 *  
+field_seasonsummer:conditionC   -0.45666    0.09387  195.30294  -4.865 2.36e-06 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation matrix not shown by default, as p = 13 > 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it
+
+
+results.revisedMFb.rmodel<-Anova(revisedMFbrmodel,test.statistic = "F")  #this takes forever. let it run. Gives a type II anova results table. 
+results.revisedMFb.rmodel
+#residuals look fine
+
+# emmeans will not matter anymore becuase the interactions have all fallen out
+emrepMFb<- emmeans(revisedMFbrmodel, pairwise~simplesex|field_season*conditionC)  
+emrepMFb
+
+> emrepMFb
+$emmeans
+field_season = spring, conditionC = 2.08:
+ simplesex emmean    SE   df lower.CL upper.CL
+ F           3.88 0.173 25.8     3.53     4.24
+ M           3.99 0.150 15.7     3.67     4.31
+
+field_season = summer, conditionC = 2.08:
+ simplesex emmean    SE   df lower.CL upper.CL
+ F           2.07 0.211 54.1     1.65     2.49
+ M           2.63 0.190 36.6     2.24     3.01
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, conditionC = 2.08:
+ contrast estimate    SE  df t.ratio p.value
+ F - M      -0.103 0.135 391  -0.764  0.4453
+
+field_season = summer, conditionC = 2.08:
+ contrast estimate    SE  df t.ratio p.value
+ F - M      -0.559 0.182 557  -3.072  0.0022
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+##########################################################################################################################################
+
+#use to plot model predicted values vs. residuals
+residuals <- residuals(revisedMFbrmodel)
+predvalues <- predict(revisedMFbrmodel)
+
+plot(x=predvalues, y=residuals,
+     xlab = 'predicted',
+     Ylab = 'actual',
+     Main = 'residuals')
+
+# Basic box plot
+p <- ggplot(Rdat, aes(x=simplesex, y=photo)) + 
+  geom_boxplot()
+p
+
+# Change point shapes and colors
+p<- ggplot(Rdat, aes(x=conditionC, y=photo, shape=simplesex, color=simplesex)) +
+  geom_point()
+
+p + geom_jitter(aes(colour = simplesex))
+
+# Basic box plot
+p <- ggplot(MFbdat, aes(x=MFsex, y=photo)) + 
+  geom_boxplot()
+p
+
+# Basic box plot
+p <- ggplot(dat2, aes(x=sex, y=conditionC)) + 
+  geom_boxplot()
+p
+
+# Change point shapes and colors
+p<- ggplot(dat2, aes(x=conditionC, y=photo, shape=sex, color=simplesex)) +
+  geom_point()
+
+p + geom_jitter(aes(colour = sex))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+######################################################################################################################################
+#######
+#######                                                         for males and mixed females only, no BM
+#######                                          Don't use monodat data, instead, start with dat2 and make a new file
+#######                                                         MFbdat has all Bf and B as Females
+######################################################################################################################################
+str(dat2)
+table (dat2$keep)
+dat2$conditionC <- as.numeric(dat2$condition)
+
+# pulls out the data we want to look at
+# reproductive trees only
+# new data frame with no records from BM trees, all BF and B put in with F
+# subset by multiple conditions using |      subset(df, gender == 'M' | state == 'PH')
+# MFbdat<-dat2 %>% filter(MFsex == "F" | MFsex =="M" )
+MFbdat <- filter(dat2, detailed_sex == "F" | detailed_sex =="M" |detailed_sex == "BF" | detailed_sex =="B" )
+summary(MFbdat$detailed_sex)
+#Recoding sex columns
+MFbdat$MFsex <- fct_recode(MFbdat$detailed_sex, F = "B", F = "BF")  # all bisexuals  and BF become F, but BM is dropped
+summary(MFbdat$MFsex)
+
+table(MFbdat$keep)
+table(MFbdat$MFsex)
+table(MFbdat$simplesex) # should be the same as above; it is
+str(MFbdat)
+
+######################################################################################################
+# fitting random effects
+### using reproductives, only M and F including b and bf
+revisedMFbrmodel <-lmer(photo ~ simplesex+par+field_season+combined_caliper+conditionC+RH_S+time_clean+VpdL+Tleaf+
+                         # 2 way
+                         simplesex:field_season + simplesex:conditionC + simplesex:combined_caliper+ field_season:conditionC +
+                         # 3 way
+                         simplesex:field_season:conditionC +
+                         #random effects
+                          (1|transect)+(1+ field_season+VpdL|tree_code), 
+                       data=MFbdat, na.action = na.omit)
+
+
+BIC(revisedMFbrmodel) #4116
+# remove 
+# (1|transect)+  BIC #4115, 
+# + (1|year).    BIC #4120  
+# + field_season BIC #4438. 
+# +VpdL          BIC #3225. 
+# random effect full are one of best, proceed (but reinvestigate removing transect)
+anova(revisedMFbrmodel) 
+summary(revisedMFbrmodel) 
+
+
+
+######################################################################################################
+# fitting fixed effects
+### using reproductives, only M and F (which. include B and BF)
+revisedMFbrmodel <-lmer(photo ~ simplesex+par+field_season+combined_caliper+conditionC+RH_S+time_clean+VpdL+Tleaf+
+                          # 2 way
+                          simplesex:field_season + simplesex:conditionC + simplesex:combined_caliper+ field_season:conditionC +
+                          # 3 way
+                          simplesex:field_season:conditionC +
+                          #random effects
+                          (1|transect)+(1+ field_season+VpdL|tree_code), 
+                        REML = FALSE, data=MFbdat, na.action = na.omit)
+
+BIC(revisedMFbrmodel) #4060
+anova(revisedMFbrmodel) 
+summary(revisedMFbrmodel) 
+
+# fitting fixed effects
+### using reproductives, only M and F (which. include B and BF)
+revisedMFbrmodel <-lmer(photo ~ simplesex+par+field_season+combined_caliper+conditionC+time_clean+VpdL+Tleaf+
+                          # 2 way
+                          simplesex:field_season +  field_season:conditionC +
+                          #random effects
+                          (1|transect)+(1+ field_season+VpdL|tree_code), 
+                        REML = FALSE, data=MFbdat, na.action = na.omit)
+
+BIC(revisedMFbrmodel) #4060
+anova(revisedMFbrmodel) 
+summary(revisedMFbrmodel) 
+# remove 
+# three-way interaction simplesex:field_season:conditionC +. BIC 4053
+# then remove two-way simplesex:combined_caliper+            BIC 4046
+# then remove two way simplesex:conditionC +                 BIC 4040
+# then remove +RH_S                                          BIC 4032
+# removing time clean bumps up AIC to 4049
+
+############################################################################################
+# fitting random effects again, go back to REML, take out bobyqa optimization
+
+
+### using reproductives, only M and F (which. include B and BF)
+revisedMFbrmodel <-lmer(photo ~ simplesex+par+field_season+combined_caliper+conditionC+time_clean+VpdL+Tleaf+
+                          # 2 way
+                          simplesex:field_season +  field_season:conditionC +
+                          #random effects
+                          (1|transect)+(1+ field_season+VpdL|tree_code), 
+                          data=MFbdat, na.action = na.omit)
+
+BIC(revisedMFbrmodel) #4075
+anova(revisedMFbrmodel) 
+summary(revisedMFbrmodel) 
+
+results.revisedMFb.rmodel<-Anova(revisedMFbrmodel,test.statistic = "F")  #this takes forever. let it run. Gives a type II anova results table. 
+results.revisedMFb.rmodel
+#residuals look fine
+
+# emmeans will not matter anymore becuase the interactions have all fallen out
+emrepMFb<- emmeans(revisedMFbrmodel, pairwise~simplesex|field_season*conditionC)  
+emrepMFb
+
+
+##########################################################################################################################################
+
+
+
+
+
+
+
+ 
+
+
