@@ -483,6 +483,30 @@ Correlation matrix not shown by default, as p = 15 > 12.
 Use print(x, correlation=TRUE)  or
     vcov(x)        if you need it
 
+> results.splitmodel.1<-Anova(splitmodel.1, test.statistic = "F") 
+> results.splitmodel.2<-Anova(splitmodel.2, test.statistic = "F") 
+> results.simplemodel.2<-Anova(simplemodel.2, test.statistic = "F") #with REML
+> 
+> results.splitmodel.1
+Analysis of Deviance Table (Type II Wald F tests with Kenward-Roger df)
+
+Response: photo
+                                       F Df  Df.res    Pr(>F)    
+splitsex                          6.5648  1  659.51  0.010623 *  
+par                             235.5405  3 1342.36 < 2.2e-16 ***
+field_season                    104.4643  1  107.15 < 2.2e-16 ***
+combined_caliper                  7.0637  1  189.21  0.008539 ** 
+condition                        25.4559  1  205.29 9.942e-07 ***
+VpdL                             61.4593  1  155.13 6.766e-13 ***
+Tleaf                           331.1592  1 1485.98 < 2.2e-16 ***
+time_clean                        0.9610  1 1242.24  0.327127    
+splitsex:field_season             2.8426  1  701.41  0.092238 .  
+splitsex:condition                1.6795  1  616.44  0.195481    
+field_season:condition           27.4077  1  268.96 3.325e-07 ***
+splitsex:field_season:condition   4.6442  1  575.02  0.031572 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
 ##### emmeans for splitmodel.1
 # comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
 #emMat<- emmeans(maturitymodelfull.1, pairwise~repro|field_season*conditionC)  
@@ -849,6 +873,25 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 Correlation matrix not shown by default, as p = 13 > 12.
 Use print(x, correlation=TRUE)  or
     vcov(x)        if you need it
+
+> results.splitmodel.2
+Analysis of Deviance Table (Type II Wald F tests with Kenward-Roger df)
+
+Response: photo
+                              F Df  Df.res    Pr(>F)    
+splitsex                 9.8265  1  846.74   0.00178 ** 
+par                    237.6003  3 1342.73 < 2.2e-16 ***
+field_season           108.4927  1  106.33 < 2.2e-16 ***
+combined_caliper         6.5502  1  173.46   0.01134 *  
+condition               40.2538  1  227.07 1.195e-09 ***
+VpdL                    64.4344  1  152.30 2.503e-13 ***
+Tleaf                  356.1556  1 1457.45 < 2.2e-16 ***
+time_clean               1.2530  1 1258.26   0.26320    
+splitsex:field_season    3.9036  1  717.14   0.04856 *  
+field_season:condition  25.6949  1  267.76 7.469e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
 
 ##### emmeans for splitmodel.2
 # comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
@@ -1227,6 +1270,24 @@ Correlation matrix not shown by default, as p = 14 > 12.
 Use print(x, correlation=TRUE)  or
     vcov(x)        if you need it
 
+> results.simplemodel.2
+Analysis of Deviance Table (Type II Wald F tests with Kenward-Roger df)
+
+Response: photo
+                                  F Df  Df.res    Pr(>F)    
+simplesex                    0.0691  1  504.99  0.792728    
+par                        234.9663  3 1342.51 < 2.2e-16 ***
+field_season               104.2973  1  107.56 < 2.2e-16 ***
+combined_caliper             6.8566  1  145.31  0.009767 ** 
+condition                   20.7623  1  237.84 8.315e-06 ***
+time_clean                   0.9440  1 1284.82  0.331427    
+VpdL                        61.7219  1  154.10 6.319e-13 ***
+Tleaf                      340.1486  1 1507.24 < 2.2e-16 ***
+simplesex:field_season       6.7606  1  585.17  0.009554 ** 
+simplesex:combined_caliper   2.6545  1  222.00  0.104675    
+field_season:condition      26.0071  1  276.42 6.324e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 ######################################################################################################################################
 #######                              Next we ask, what kind of differences do we see just within our monoecious trees?
 #######                                  So here, we take all B trees and exclude them , exclude BF or BM
@@ -1333,6 +1394,26 @@ Correlation matrix not shown by default, as p = 17 > 12.
 Use print(x, correlation=TRUE)  or
     vcov(x)        if you need it
 
+results.Monoeciousmodel<-Anova(Monoeciousmodel, test.statistic = "F") #with REML
+results.Monoeciousmodel
+
+Analysis of Deviance Table (Type II Wald F tests with Kenward-Roger df)
+
+Response: photo
+                                F Df  Df.res    Pr(>F)    
+detailed_sex               4.0645  2 224.783  0.018448 *  
+par                       21.6817  3 242.427 1.789e-12 ***
+field_season              29.8218  1  30.546 5.994e-06 ***
+combined_caliper           1.1638  1  75.420  0.284119    
+condition                  0.0044  1  87.380  0.947182    
+RH_S                      31.7989  1  56.876 5.598e-07 ***
+Tleaf                      8.5710  1  83.723  0.004397 ** 
+time_clean                 0.6093  1 142.068  0.436364    
+detailed_sex:field_season  4.6587  2  54.051  0.013595 *  
+detailed_sex:condition     6.8219  2  53.063  0.002309 ** 
+field_season:condition     4.2842  1  45.620  0.044159 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 ##### emmeans for Monoeciousmodel
 # comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
