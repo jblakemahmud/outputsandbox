@@ -1,0 +1,390 @@
+# output from models 5.18.25
+
+> maturitymodel.1 <-lmer(photo ~ reproductive+par+field_season+combined_caliper+condition+time_clean+VpdL+Tleaf+
++                          # 2 way
++                          reproductive:field_season + reproductive:condition +  condition:field_season+
++                          #random effects
++                          (1|transect)+(1 + field_season + VpdL |tree_code)+ (1|year), 
++                          data=Repdat, na.action = na.omit) #, lmerControl(optimizer = "bobyqa" ))
+> anova(maturitymodel.1) 
+Type III Analysis of Variance Table with Satterthwaite's method
+                          Sum Sq Mean Sq NumDF   DenDF  F value    Pr(>F)    
+reproductive               10.46  10.463     1 1083.29  18.9181 1.493e-05 ***
+par                       504.53 168.177     3 1979.28 304.0732 < 2.2e-16 ***
+field_season                3.11   3.114     1  170.87   5.6300   0.01877 *  
+combined_caliper            2.49   2.491     1  143.32   4.5030   0.03556 *  
+condition                  10.61  10.607     1  288.85  19.1788 1.666e-05 ***
+time_clean                  0.08   0.075     1 2189.56   0.1360   0.71229    
+VpdL                       42.43  42.425     1  164.21  76.7069 2.338e-15 ***
+Tleaf                     265.18 265.182     1 2232.70 479.4648 < 2.2e-16 ***
+reproductive:field_season   8.58   8.579     1 1093.06  15.5116 8.719e-05 ***
+reproductive:condition      3.24   3.235     1  897.72   5.8498   0.01578 *  
+field_season:condition     24.85  24.852     1  323.06  44.9341 9.093e-11 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> summary(maturitymodel.1)
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: photo ~ reproductive + par + field_season + combined_caliper +      condition + time_clean + VpdL + Tleaf + reproductive:field_season +  
+    reproductive:condition + condition:field_season + (1 | transect) +      (1 + field_season + VpdL | tree_code) + (1 | year)
+   Data: Repdat
+
+REML criterion at convergence: 6224.4
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.9758 -0.5663 -0.0013  0.5732  3.2329 
+
+Random effects:
+ Groups    Name               Variance Std.Dev. Corr       
+ tree_code (Intercept)        1.28852  1.1351              
+           field_seasonsummer 1.44630  1.2026   -0.24      
+           VpdL               3.22640  1.7962   -0.89 -0.09
+ transect  (Intercept)        0.45466  0.6743              
+ year      (Intercept)        0.01166  0.1080              
+ Residual                     0.55308  0.7437              
+Number of obs: 2401, groups:  tree_code, 137; transect, 14; year, 3
+
+Fixed effects:
+                                   Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                      -5.412e-02  3.152e-01  7.433e+01  -0.172  0.86416    
+reproductiveR                     6.792e-01  1.070e-01  9.276e+02   6.348 3.40e-10 ***
+par500                            8.283e-01  4.304e-02  1.945e+03  19.243  < 2e-16 ***
+par1000                           1.108e+00  4.401e-02  1.986e+03  25.179  < 2e-16 ***
+par1500                           1.260e+00  4.602e-02  2.049e+03  27.379  < 2e-16 ***
+field_seasonsummer               -1.380e-01  1.807e-01  1.873e+02  -0.764  0.44597    
+combined_caliper                 -2.205e-02  1.039e-02  1.433e+02  -2.122  0.03556 *  
+condition                         1.487e-01  5.470e-02  3.857e+02   2.718  0.00686 ** 
+time_clean                        1.457e-01  3.950e-01  2.190e+03   0.369  0.71229    
+VpdL                             -1.893e+00  2.161e-01  1.642e+02  -8.758 2.34e-15 ***
+Tleaf                             2.127e-01  9.712e-03  2.233e+03  21.897  < 2e-16 ***
+reproductiveR:field_seasonsummer -5.352e-01  1.359e-01  1.093e+03  -3.938 8.72e-05 ***
+reproductiveR:condition          -1.224e-01  5.061e-02  8.977e+02  -2.419  0.01578 *  
+field_seasonsummer:condition     -4.891e-01  7.296e-02  3.231e+02  -6.703 9.09e-11 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation matrix not shown by default, as p = 14 > 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it
+
+
+> results.maturitymodel.1
+Analysis of Deviance Table (Type II Wald F tests with Kenward-Roger df)
+
+Response: photo
+                                 F Df  Df.res    Pr(>F)    
+reproductive               16.8109  1  959.72 4.479e-05 ***
+par                       226.2948  3 2166.28 < 2.2e-16 ***
+field_season              530.3012  1 2300.32 < 2.2e-16 ***
+combined_caliper            2.4970  1  186.55 0.1157581    
+condition                   6.0176  1  264.92 0.0148089 *  
+time_clean                  0.8541  1 2298.88 0.3554840    
+VpdL                       66.7795  1  200.30 3.393e-14 ***
+Tleaf                     314.0148  1 2292.26 < 2.2e-16 ***
+reproductive:field_season   1.9217  1 2296.31 0.1658009    
+reproductive:condition      5.5941  1 1065.71 0.0181999 *  
+field_season:condition     12.6619  1 2313.44 0.0003807 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+##### emmeans
+# comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
+#emMat<- emmeans(maturitymodelfull.1, pairwise~repro|field_season*conditionC)  
+emMat<- emmeans(maturitymodel.1, pairwise~reproductive|field_season*condition*reproductive) 
+# above averages over all condition types
+summary(emMat)
+confint(emMat)
+
+> # above averages over all condition types
+> summary(emMat)
+$emmeans
+field_season = spring, condition = 1.68:
+ reproductive emmean    SE   df lower.CL upper.CL
+ N              3.59 0.226 16.6     3.11     4.07
+ R              3.90 0.221 15.2     3.43     4.37
+
+field_season = summer, condition = 1.68:
+ reproductive emmean    SE   df lower.CL upper.CL
+ N              2.48 0.227 16.7     2.00     2.96
+ R              2.67 0.222 15.4     2.20     3.14
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, condition = 1.68:
+ contrast estimate     SE   df t.ratio p.value
+ N - R      -0.312 0.0864 1286  -3.603  0.0003
+
+field_season = summer, condition = 1.68:
+ contrast estimate     SE   df t.ratio p.value
+ N - R      -0.190 0.0900 1308  -2.113  0.0348
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> confint(emMat)
+$emmeans
+field_season = spring, condition = 1.68:
+ reproductive emmean    SE   df lower.CL upper.CL
+ N              3.59 0.226 16.6     3.11     4.07
+ R              3.90 0.221 15.2     3.43     4.37
+
+field_season = summer, condition = 1.68:
+ reproductive emmean    SE   df lower.CL upper.CL
+ N              2.48 0.227 16.7     2.00     2.96
+ R              2.67 0.222 15.4     2.20     3.14
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, condition = 1.68:
+ contrast estimate     SE   df lower.CL upper.CL
+ N - R      -0.312 0.0864 1286   -0.481  -0.1419
+
+field_season = summer, condition = 1.68:
+ contrast estimate     SE   df lower.CL upper.CL
+ N - R      -0.190 0.0900 1308   -0.367  -0.0136
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+# comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
+emMat.0<- emmeans(maturitymodel.1, pairwise~reproductive|field_season*condition, at= list(condition = 0)) 
+emMat.1<- emmeans(maturitymodel.1, pairwise~reproductive|field_season*condition, at= list(condition = 1)) 
+emMat.2<- emmeans(maturitymodel.1, pairwise~reproductive|field_season*condition, at= list(condition = 2)) 
+emMat.3<- emmeans(maturitymodel.1, pairwise~reproductive|field_season*condition, at= list(condition = 3)) 
+emMat.4<- emmeans(maturitymodel.1, pairwise~reproductive|field_season*condition, at= list(condition = 4)) 
+emMat.5<- emmeans(maturitymodel.1, pairwise~reproductive|field_season*condition, at= list(condition = 5)) 
+
+# above looks at one level of condition - maturity model
+summary(emMat.0)
+summary(emMat.1)
+summary(emMat.2)
+summary(emMat.3)
+summary(emMat.4)
+summary(emMat.5)
+
+> summary(emMat.0)
+$emmeans
+field_season = spring, condition = 0:
+ reproductive emmean    SE   df lower.CL upper.CL
+ N              3.49 0.236 19.4     3.00     3.99
+ R              4.04 0.238 20.1     3.54     4.53
+
+field_season = summer, condition = 0:
+ reproductive emmean    SE   df lower.CL upper.CL
+ N              2.59 0.237 19.8     2.10     3.09
+ R              3.02 0.240 20.8     2.52     3.52
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, condition = 0:
+ contrast estimate    SE   df t.ratio p.value
+ N - R      -0.544 0.114 1321  -4.760  <.0001
+
+field_season = summer, condition = 0:
+ contrast estimate    SE   df t.ratio p.value
+ N - R      -0.423 0.119 1372  -3.557  0.0004
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emMat.1)
+$emmeans
+field_season = spring, condition = 1:
+ reproductive emmean    SE   df lower.CL upper.CL
+ N              3.55 0.225 16.3     3.07     4.03
+ R              3.96 0.225 16.2     3.48     4.43
+
+field_season = summer, condition = 1:
+ reproductive emmean    SE   df lower.CL upper.CL
+ N              2.52 0.226 16.5     2.05     3.00
+ R              2.81 0.226 16.6     2.33     3.29
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, condition = 1:
+ contrast estimate     SE   df t.ratio p.value
+ N - R      -0.406 0.0861 1388  -4.717  <.0001
+
+field_season = summer, condition = 1:
+ contrast estimate     SE   df t.ratio p.value
+ N - R      -0.285 0.0906 1432  -3.141  0.0017
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emMat.2)
+$emmeans
+field_season = spring, condition = 2:
+ reproductive emmean    SE   df lower.CL upper.CL
+ N              3.61 0.229 17.4     3.12     4.09
+ R              3.87 0.221 15.1     3.40     4.34
+
+field_season = summer, condition = 2:
+ reproductive emmean    SE   df lower.CL upper.CL
+ N              2.46 0.229 17.6     1.97     2.94
+ R              2.60 0.222 15.3     2.13     3.07
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, condition = 2:
+ contrast estimate     SE   df t.ratio p.value
+ N - R      -0.268 0.0926 1218  -2.891  0.0039
+
+field_season = summer, condition = 2:
+ contrast estimate     SE   df t.ratio p.value
+ N - R      -0.146 0.0955 1228  -1.533  0.1255
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emMat.3)
+$emmeans
+field_season = spring, condition = 3:
+ reproductive emmean    SE   df lower.CL upper.CL
+ N              3.66 0.246 23.2     3.15     4.17
+ R              3.79 0.226 16.6     3.31     4.27
+
+field_season = summer, condition = 3:
+ reproductive emmean    SE   df lower.CL upper.CL
+ N              2.39 0.247 23.5     1.88     2.90
+ R              2.40 0.226 16.8     1.92     2.87
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, condition = 3:
+ contrast estimate    SE   df t.ratio p.value
+ N - R    -0.12952 0.129 1086  -1.006  0.3148
+
+field_season = summer, condition = 3:
+ contrast estimate    SE   df t.ratio p.value
+ N - R    -0.00814 0.130 1072  -0.063  0.9500
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emMat.4)
+$emmeans
+field_season = spring, condition = 4:
+ reproductive emmean    SE   df lower.CL upper.CL
+ N              3.72 0.275 35.5     3.16     4.28
+ R              3.71 0.240 21.0     3.21     4.21
+
+field_season = summer, condition = 4:
+ reproductive emmean    SE   df lower.CL upper.CL
+ N              2.32 0.276 36.3     1.76     2.88
+ R              2.19 0.240 21.2     1.69     2.69
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, condition = 4:
+ contrast estimate    SE   df t.ratio p.value
+ N - R     0.00877 0.177 1048   0.049  0.9605
+
+field_season = summer, condition = 4:
+ contrast estimate    SE   df t.ratio p.value
+ N - R     0.13015 0.177 1030   0.734  0.4632
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emMat.5)
+$emmeans
+field_season = spring, condition = 5:
+ reproductive emmean    SE   df lower.CL upper.CL
+ N              3.78 0.311 57.1     3.15     4.40
+ R              3.63 0.261 29.2     3.09     4.16
+
+field_season = summer, condition = 5:
+ reproductive emmean    SE   df lower.CL upper.CL
+ N              2.25 0.314 59.2     1.62     2.88
+ R              1.98 0.262 29.8     1.45     2.52
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, condition = 5:
+ contrast estimate   SE   df t.ratio p.value
+ N - R       0.147 0.23 1039   0.638  0.5235
+
+field_season = summer, condition = 5:
+ contrast estimate   SE   df t.ratio p.value
+ N - R       0.268 0.23 1021   1.167  0.2433
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger
+
+# like emmeans but with continuous variables
+trendemMat<-emtrends(maturitymodel.1, ~reproductive*field_season, var = "condition")
+
+summary(trendemMat)
+# to get pvalues
+test(trendemMat)
+
+
+> summary(trendemMat)
+ reproductive field_season condition.trend     SE  df lower.CL upper.CL
+ N            spring                0.0565 0.0571 768  -0.0556   0.1687
+ R            spring               -0.0817 0.0456 357  -0.1715   0.0080
+ N            summer               -0.0684 0.0583 791  -0.1829   0.0462
+ R            summer               -0.2066 0.0467 386  -0.2984  -0.1149
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+> # to get pvalues
+> test(trendemMat)
+ reproductive field_season condition.trend     SE  df t.ratio p.value
+ N            spring                0.0565 0.0571 768   0.989  0.3227
+ R            spring               -0.0817 0.0456 357  -1.791  0.0741
+ N            summer               -0.0684 0.0583 791  -1.172  0.2417
+ R            summer               -0.2066 0.0467 386  -4.427  <.0001
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger
+
+# pairwise comparisons
+trendemMat.pairwise<-emtrends(maturitymodel.1, pairwise~field_season, var = "condition")
+trendemMat.pairwise
+summary(trendemMat.pairwise) 
+# to get pvalues
+test(trendemMat.pairwise) 
+
+> test(trendemMat.pairwise) 
+$emtrends
+ field_season condition.trend     SE  df t.ratio p.value
+ spring               -0.0126 0.0427 426  -0.295  0.7678
+ summer               -0.1375 0.0440 462  -3.124  0.0019
+
+Results are averaged over the levels of: reproductive, par 
+Degrees-of-freedom method: kenward-roger 
+
+$contrasts
+ contrast        estimate     SE   df t.ratio p.value
+ spring - summer    0.125 0.0351 2313   3.558  0.0004
+
+Results are averaged over the levels of: reproductive, par 
+Degrees-of-freedom method: kenward-roger 
