@@ -781,35 +781,87 @@ $contrasts
 Results are averaged over the levels of: splitsex, par 
 Degrees-of-freedom method: kenward-roger 
 
+######################################################
 
+> ### using FMdat with bisexuals split out
+> splitmodel.2 <-lmer(photo ~ splitsex+par+field_season+combined_caliper+condition+VpdL+Tleaf+time_clean+
++                       # 2 way
++                       splitsex:field_season +  field_season:condition +
++                       #random effects
++                       (1|transect)+(1+ field_season+VpdL|tree_code)+ (1|year), 
++                       REML= FALSE, data=FMdat, na.action = na.omit, lmerControl(optimizer = "bobyqa" ))
+> #AIC(splitmodel.2) #4099
+> BIC(splitmodel.2) #4222 without  # 3 way splitsex:field_season:condition +.  #4216 without + splitsex:condition 
+[1] 4216.748
+> anova(splitmodel.2) 
+Type III Analysis of Variance Table with Satterthwaite's method
+                       Sum Sq Mean Sq NumDF   DenDF  F value    Pr(>F)    
+splitsex                 5.35   5.353     1  549.27  10.2186   0.00147 ** 
+par                    374.44 124.812     3 1286.67 238.2620 < 2.2e-16 ***
+field_season             2.91   2.911     1  161.06   5.5571   0.01961 *  
+combined_caliper         2.95   2.951     1  114.65   5.6332   0.01929 *  
+condition               25.51  25.508     1  193.00  48.6946 4.668e-11 ***
+VpdL                    33.36  33.362     1  144.08  63.6879 4.165e-13 ***
+Tleaf                  181.75 181.750     1 1400.24 346.9552 < 2.2e-16 ***
+time_clean               0.58   0.576     1 1245.00   1.1004   0.29439    
+splitsex:field_season    2.11   2.114     1  587.15   4.0364   0.04499 *  
+field_season:condition  14.69  14.695     1  200.88  28.0516 3.088e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> summary(splitmodel.2) 
+Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: photo ~ splitsex + par + field_season + combined_caliper + condition +  
+    VpdL + Tleaf + time_clean + splitsex:field_season + field_season:condition +      (1 | transect) + (1 + field_season + VpdL | tree_code) +  
+    (1 | year)
+   Data: FMdat
+Control: lmerControl(optimizer = "bobyqa")
 
+     AIC      BIC   logLik deviance df.resid 
+  4098.7   4216.7  -2027.4   4054.7     1559 
 
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-4.2186 -0.5491  0.0009  0.5387  3.2668 
 
+Random effects:
+ Groups    Name               Variance Std.Dev. Corr       
+ tree_code (Intercept)        0.98401  0.9920              
+           field_seasonsummer 1.68734  1.2990   -0.19      
+           VpdL               2.66772  1.6333   -0.85 -0.02
+ transect  (Intercept)        0.12867  0.3587              
+ year      (Intercept)        0.01234  0.1111              
+ Residual                     0.52384  0.7238              
+Number of obs: 1581, groups:  tree_code, 103; transect, 14; year, 3
 
+Fixed effects:
+                               Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                     1.10252    0.34789  224.35738   3.169  0.00174 ** 
+splitsexF                      -0.12765    0.11000  443.17239  -1.160  0.24647    
+par500                          0.87582    0.05175 1258.26673  16.924  < 2e-16 ***
+par1000                         1.17752    0.05294 1292.10952  22.242  < 2e-16 ***
+par1500                         1.35092    0.05548 1343.21275  24.348  < 2e-16 ***
+field_seasonsummer             -0.38524    0.23949  120.82616  -1.609  0.11032    
+combined_caliper               -0.02896    0.01220  114.65194  -2.373  0.01929 *  
+condition                      -0.10553    0.05262  138.15711  -2.006  0.04685 *  
+VpdL                           -2.00755    0.25156  144.07674  -7.980 4.17e-13 ***
+Tleaf                           0.22168    0.01190 1400.23519  18.627  < 2e-16 ***
+time_clean                     -0.53780    0.51269 1244.99606  -1.049  0.29439    
+splitsexF:field_seasonsummer   -0.38962    0.19393  587.15395  -2.009  0.04499 *  
+field_seasonsummer:condition   -0.49389    0.09325  200.88207  -5.296 3.09e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
+Correlation matrix not shown by default, as p = 13 > 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+##### emmeans for splitmodel.2
+# comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
+#emMat<- emmeans(maturitymodelfull.1, pairwise~repro|field_season*conditionC)  
+emsplit2<- emmeans(splitmodel.2, pairwise~splitsex|field_season*condition*splitsex) 
+# above averages over all condition types
+summary(emsplit2)
+confint(emsplit2)
 
 > summary(emsplit2)
 $emmeans
@@ -868,33 +920,258 @@ Results are averaged over the levels of: par
 Degrees-of-freedom method: kenward-roger 
 Confidence level used: 0.95 
 
+
 # comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
-emsplit.0<- emmeans(splitmodel.1, pairwise~splitsex|field_season*condition, at= list(condition = 0)) 
-emsplit.1<- emmeans(splitmodel.1, pairwise~splitsex|field_season*condition, at= list(condition = 1)) 
-emsplit.2<- emmeans(splitmodel.1, pairwise~splitsex|field_season*condition, at= list(condition = 2)) 
-emsplit.3<- emmeans(splitmodel.1, pairwise~splitsex|field_season*condition, at= list(condition = 3)) 
-emsplit.4<- emmeans(splitmodel.1, pairwise~splitsex|field_season*condition, at= list(condition = 4)) 
-emsplit.5<- emmeans(splitmodel.1, pairwise~splitsex|field_season*condition, at= list(condition = 5)) 
+# does not change over time
+emsplit2.0<- emmeans(splitmodel.2, pairwise~splitsex|field_season*condition, at= list(condition = 0)) 
+emsplit2.1<- emmeans(splitmodel.2, pairwise~splitsex|field_season*condition, at= list(condition = 1)) 
+emsplit2.2<- emmeans(splitmodel.2, pairwise~splitsex|field_season*condition, at= list(condition = 2)) 
+emsplit2.3<- emmeans(splitmodel.2, pairwise~splitsex|field_season*condition, at= list(condition = 3)) 
+emsplit2.4<- emmeans(splitmodel.2, pairwise~splitsex|field_season*condition, at= list(condition = 4)) 
+emsplit2.5<- emmeans(splitmodel.2, pairwise~splitsex|field_season*condition, at= list(condition = 5)) 
 
 # above looks at one level of condition - maturity model
-summary(emsplit.0)
-summary(emsplit.1)
-summary(emsplit.2)
-summary(emsplit.3)
-summary(emsplit.4)
-summary(emsplit.5)
+summary(emsplit2.0)
+summary(emsplit2.1)
+summary(emsplit2.2)
+summary(emsplit2.3)
+summary(emsplit2.4)
+summary(emsplit2.5)
+
+ # above looks at one level of condition - maturity model
+> summary(emsplit2.0)
+$emmeans
+field_season = spring, condition = 0:
+ splitsex emmean    SE    df lower.CL upper.CL
+ M          4.23 0.185  38.2     3.85     4.61
+ F          4.10 0.208  60.8     3.69     4.52
+
+field_season = summer, condition = 0:
+ splitsex emmean    SE    df lower.CL upper.CL
+ M          3.84 0.257 110.6     3.34     4.35
+ F          3.33 0.284 176.0     2.77     3.89
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, condition = 0:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.128 0.113 562   1.132  0.2582
+
+field_season = summer, condition = 0:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.517 0.168 796   3.081  0.0021
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emsplit2.1)
+$emmeans
+field_season = spring, condition = 1:
+ splitsex emmean    SE    df lower.CL upper.CL
+ M          4.12 0.160  22.9     3.79     4.46
+ F          4.00 0.182  38.9     3.63     4.37
+
+field_season = summer, condition = 1:
+ splitsex emmean    SE    df lower.CL upper.CL
+ M          3.25 0.211  62.5     2.82     3.67
+ F          2.73 0.239 105.4     2.25     3.20
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, condition = 1:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.128 0.113 562   1.132  0.2582
+
+field_season = summer, condition = 1:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.517 0.168 796   3.081  0.0021
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emsplit2.2)
+$emmeans
+field_season = spring, condition = 2:
+ splitsex emmean    SE   df lower.CL upper.CL
+ M          4.02 0.152 19.0     3.70     4.34
+ F          3.89 0.172 30.9     3.54     4.24
+
+field_season = summer, condition = 2:
+ splitsex emmean    SE   df lower.CL upper.CL
+ M          2.65 0.193 47.2     2.26     3.03
+ F          2.13 0.218 75.9     1.69     2.56
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, condition = 2:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.128 0.113 562   1.132  0.2582
+
+field_season = summer, condition = 2:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.517 0.168 796   3.081  0.0021
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emsplit2.3)
+$emmeans
+field_season = spring, condition = 3:
+ splitsex emmean    SE   df lower.CL upper.CL
+ M          3.91 0.163 25.0     3.58     4.25
+ F          3.79 0.178 34.8     3.42     4.15
+
+field_season = summer, condition = 3:
+ splitsex emmean    SE   df lower.CL upper.CL
+ M          2.05 0.211 64.7     1.63     2.47
+ F          1.53 0.229 84.2     1.07     1.98
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, condition = 3:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.128 0.113 562   1.132  0.2582
+
+field_season = summer, condition = 3:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.517 0.168 796   3.081  0.0021
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emsplit2.4)
+$emmeans
+field_season = spring, condition = 4:
+ splitsex emmean    SE    df lower.CL upper.CL
+ M          3.81 0.191  43.5    3.424     4.19
+ F          3.68 0.201  50.6    3.277     4.08
+
+field_season = summer, condition = 4:
+ splitsex emmean    SE    df lower.CL upper.CL
+ M          1.45 0.256 120.2    0.941     1.95
+ F          0.93 0.267 124.0    0.402     1.46
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, condition = 4:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.128 0.113 562   1.132  0.2582
+
+field_season = summer, condition = 4:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.517 0.168 796   3.081  0.0021
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+
+> summary(emsplit2.5)
+$emmeans
+field_season = spring, condition = 5:
+ splitsex emmean    SE    df lower.CL upper.CL
+ M         3.702 0.228  75.3    3.248    4.157
+ F         3.575 0.234  77.3    3.109    4.041
+
+field_season = summer, condition = 5:
+ splitsex emmean    SE    df lower.CL upper.CL
+ M         0.848 0.317 202.9    0.222    1.473
+ F         0.330 0.323 179.6   -0.306    0.967
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+field_season = spring, condition = 5:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.128 0.113 562   1.132  0.2582
+
+field_season = summer, condition = 5:
+ contrast estimate    SE  df t.ratio p.value
+ M - F       0.517 0.168 796   3.081  0.0021
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
 
 # like emmeans but with continuous variables
-trendemsplit<-emtrends(splitmodel.1, ~splitsex*field_season, var = "condition")
+trendemsplit2<-emtrends(splitmodel.2, ~splitsex*field_season, var = "condition")
 
-summary(trendemsplit)
+summary(trendemsplit2)
 # to get pvalues
-test(trendemsplit)
+test(trendemsplit2)
+
+> # to get pvalues
+> test(trendemsplit2)
+ splitsex field_season condition.trend     SE  df t.ratio p.value
+ M        spring                -0.106 0.0551 185  -1.914  0.0572
+ F        spring                -0.106 0.0551 185  -1.914  0.0572
+ M        summer                -0.599 0.0840 369  -7.137  <.0001
+ F        summer                -0.599 0.0840 369  -7.137  <.0001
+
+Results are averaged over the levels of: par 
+Degrees-of-freedom method: kenward-roger 
 
 # pairwise comparisons
-trendemsplit.pairwise<-emtrends(splitmodel.1, pairwise~field_season, var = "condition")
-trendemsplit.pairwise
-summary(trendemsplit.pairwise) 
+trendemsplit2.pairwise<-emtrends(splitmodel.2, pairwise~field_season, var = "condition")
+trendemsplit2.pairwise
+summary(trendemsplit2.pairwise) 
 # to get pvalues
-test(trendemsplit.pairwise) 
+test(trendemsplit2.pairwise) 
+
+> # to get pvalues
+> test(trendemsplit2.pairwise) 
+$emtrends
+ field_season condition.trend     SE  df t.ratio p.value
+ spring                -0.106 0.0551 185  -1.914  0.0572
+ summer                -0.599 0.0840 369  -7.137  <.0001
+
+Results are averaged over the levels of: splitsex, par 
+Degrees-of-freedom method: kenward-roger 
+
+$contrasts
+ contrast        estimate     SE  df t.ratio p.value
+ spring - summer    0.494 0.0958 288   5.155  <.0001
+
+Results are averaged over the levels of: splitsex, par 
+Degrees-of-freedom method: kenward-roger 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
