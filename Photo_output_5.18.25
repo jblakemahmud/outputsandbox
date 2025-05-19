@@ -344,7 +344,6 @@ summary(trendemMat)
 # to get pvalues
 test(trendemMat)
 
-
 > summary(trendemMat)
  reproductive field_season condition.trend     SE  df lower.CL upper.CL
  N            spring                0.0565 0.0571 768  -0.0556   0.1687
@@ -388,8 +387,6 @@ $contrasts
 
 Results are averaged over the levels of: reproductive, par 
 Degrees-of-freedom method: kenward-roger 
-
-
 
 ######################################################################################################################################
 #######       Next we ask, are there differences in individuals, or PARTS of individuals that flower either male or female?
@@ -567,8 +564,6 @@ summary(emsplit.3)
 summary(emsplit.4)
 summary(emsplit.5)
 
-
-> 
 > 
 > # above looks at one level of condition - maturity model
 > summary(emsplit.0)
@@ -919,7 +914,6 @@ field_season = summer, condition = 2.1:
 Results are averaged over the levels of: par 
 Degrees-of-freedom method: kenward-roger 
 Confidence level used: 0.95 
-
 
 # comparison of each sex by season, holding condition constant; correcting for multiple tests within a subgroup 
 # does not change over time
