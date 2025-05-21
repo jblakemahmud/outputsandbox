@@ -1,0 +1,94 @@
+demo_and_photo_data_5_17_25 <- read_excel("demo_and_photo_data_5.17.25.xlsx", 
+                                          sheet = "photo.r")
+
+# pulls out the data we want to look at
+samdat<- select(demo_and_photo_data_5_17_25,year, transect, tree_id, detailed_sex,  tree_code, field_season, photo, time_clean, VpdL,Tleaf, RH_R, RH_S, PARi,dbh, combined_dbh, combined_caliper, condition,keep_BMBF,keep)
+
+> table(samdat$keep_BMBF)
+   0    1 
+ 293 2544 
+
+> table(samdat$keep)
+   0    1 
+ 335 2502 
+
+# subsetting data file - just keep some of the rows
+# makes a data file where all the BM trees become M, all the BF trees become F and all the B trees fall out
+# some trees represented more than once in df
+FMdat <- filter(samdat, keep_BMBF == "1")
+FMdat <- filter(FMdat, splitsex == "M" |splitsex == "F" ). # need the vertical line for this *or* that
+
+# subsetting data file - just keep some of the rows
+# makes a data file where all the BM and BF trees have been averaged to become B
+# all trees represented once in df
+# use for the repro / not repro maturity model
+Repdat <- filter(samdat, keep == "1")
+table(Repdat$reproductive)
+str(Repdat)
+
+#confirming who is in what table:
+#samdat
+> table(samdat$detailed_sex)
+   .    B   BF   BM    F    M    N 
+  48   76  193  133  255 1163  969 
+
+> table(samdat$sex)
+   M    B    F    N 
+1163  402  255  969 
+
+> table(samdat$simplesex)
+   M    F    N 
+1163  657  969 
+
+> table(samdat$splitsex)
+   M    F    N 
+1296  448  969 
+
+> table(samdat$reproductive)
+   N    R 
+ 969 1820 
+
+#FMdat
+> table(FMdat$detailed_sex)
+   .    B   BF   BM    F    M    N 
+   0    0  176  116  235 1094    0 
+
+> table(FMdat$sex)
+   M    B    F    N 
+1094  292  235    0 
+
+> table(FMdat$simplesex)
+   M    F    N 
+1094  527    0 
+
+> table(FMdat$splitsex)
+   M    F    N 
+1210  411    0 
+
+> table(FMdat$reproductive)
+   N    R 
+   0 1621 
+
+#Repdat
+> table(Repdat$detailed_sex)
+   .    B   BF   BM    F    M    N 
+   0   72  116   60  235 1096  923 
+
+> table(Repdat$sex)
+   M    B    F    N 
+1096  248  235  923 
+
+> table(Repdat$simplesex)
+   M    F    N 
+1096  483  923 
+
+> table(Repdat$splitsex)
+   M    F    N 
+1156  351  923 
+
+> table(Repdat$reproductive)
+   N    R 
+ 923 1579 
+
+
+  
